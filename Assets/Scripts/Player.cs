@@ -8,6 +8,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _playerSpeed =  7.36f;
     [SerializeField]
+    private float _playerBoostPowerupSpeed = 1f;
+    [SerializeField]
     private float _playerBoostSpeed = 1f;
     [SerializeField]
     private GameObject _laserPrefab;
@@ -21,6 +23,7 @@ public class Player : MonoBehaviour
     private int _playerLives = 3;
     private SpawnManager _spawnManager;
     private bool _tripleShotActive = false;
+    private bool _speedBoostPowerupActive = false;
     private bool _speedBoostActive = false;
     private bool _shieldActive = false;
     [SerializeField]
@@ -84,6 +87,8 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CheckForThrusterBoost();
+
         if (Time.time > _noLogerStunnedTimeStamp)
         {
             CalcMovement();
@@ -107,7 +112,7 @@ public class Player : MonoBehaviour
             if (transform.position.y < 5.5f && transform.position.y > -3.8f)  // In vertical bounds
             {
                 //Move player
-                transform.Translate(direction * _playerSpeed *_playerBoostSpeed * Time.deltaTime);
+                transform.Translate(direction * _playerSpeed * _playerBoostPowerupSpeed * _playerBoostSpeed * Time.deltaTime);
             }
             else  // Out of vertical bounds
             {
@@ -122,6 +127,20 @@ public class Player : MonoBehaviour
             else {transform.position = new Vector3(-8.999f, transform.position.y, transform.position.z);}
         }
     }
+
+    void CheckForThrusterBoost()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            _speedBoostActive = true;
+            _playerBoostSpeed = 1.5f;
+        } else
+        {
+            _speedBoostActive = false;
+            _playerBoostSpeed = 1;
+        }
+    }
+
     void FireLaser()
     {
         //Fire triple shot?
@@ -160,18 +179,18 @@ public class Player : MonoBehaviour
         _tripleShotActive = false;
     }
 
-    public void SpeedBoostActive()
+    public void SpeedBoostPowerupActive() 
     {
-        _speedBoostActive = true;
-        _playerBoostSpeed = 2f;
-        StartCoroutine(SpeedBoostPowerDown());
+        _speedBoostPowerupActive = true;
+        _playerBoostPowerupSpeed = 2f;
+        StartCoroutine(SpeedBoostPowerupPowerDown());
     }
 
-    IEnumerator SpeedBoostPowerDown()
+    IEnumerator SpeedBoostPowerupPowerDown()  
     {
         yield return new WaitForSeconds(10f);
-        _speedBoostActive = false;
-        _playerBoostSpeed = 1;
+        _speedBoostPowerupActive = false;
+        _playerBoostPowerupSpeed = 1;
     }
 
     public void ShieldActive()
