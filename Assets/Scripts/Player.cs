@@ -281,6 +281,23 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void AddLives(int lives)
+    {
+        if (_playerLives < 3)
+        {
+            if (_playerLives == 2)
+            {
+                _damagedFire1GO.GetComponent<DamagedFire>().DeactivateDamage();
+            } 
+            else if (_playerLives == 1)
+            {
+                _damagedFire2GO.GetComponent<DamagedFire>().DeactivateDamage();
+            }
+            _playerLives += lives;
+            UIManagerScript.UpdateNumOfLivesDisplay(_playerLives);
+        }
+    }
+
     public void UpdatePlayerScore(int addToPlayerScore)
     {
         _playerScore += addToPlayerScore;

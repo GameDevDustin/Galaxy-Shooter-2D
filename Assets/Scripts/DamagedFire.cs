@@ -20,4 +20,9 @@ public class DamagedFire : MonoBehaviour
     {
         transform.gameObject.SetActive(true);
     }
+
+    public void DeactivateDamage()
+    {
+        transform.gameObject.SetActive(false);
+    }
 }

@@ -134,9 +134,9 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.025456667, y: 0}
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.67819905
 --- !u!50 &3632003429298097883
 Rigidbody2D:
   serializedVersion: 4
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _powerupSpeed: 3
   _powerupAudioClip: {fileID: 8300000, guid: 5ee343246919d2b4bba63ae629e95494, type: 3}
-  _powerupID: 3
+  _powerupID: 5
 --- !u!82 &2549200252438978622
 AudioSource:
   m_ObjectHideFlags: 0
@@ -185,7 +185,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.3
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -295,7 +295,7 @@ Transform:
   m_GameObject: {fileID: 8778863322187484935}
   m_LocalRotation: {x: -0, y: -0, z: -0.38268343, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6465099341767958767}
