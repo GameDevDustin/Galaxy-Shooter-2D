@@ -49,6 +49,12 @@ public class Player : MonoBehaviour
     private GameObject _shieldStrengthTextGO;
     [SerializeField]
     private int _shieldPower = 0;
+    [SerializeField]
+    private GameObject _ammoChargeGO;
+    [SerializeField]
+    private int _ammoChargeCount = 15;
+    [SerializeField]
+    private float _ammoChargeSize = 120;
 
     // Start is called before the first frame update
     void Start()
@@ -135,13 +141,19 @@ public class Player : MonoBehaviour
         } 
         else //Fire standard laser
         {
-            _nextLaserFireTimeStamp = Time.time + _laserFireRate;
-            Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
-        }
+            if(_ammoChargeCount > 0)
+            {
+                _nextLaserFireTimeStamp = Time.time + _laserFireRate;
+                Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
+                _ammoChargeCount -= 1;
+                _ammoChargeSize -= 8;
+                _ammoChargeGO.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _ammoChargeSize);
 
-        //Play laser audio
-        _playerAudioSource.clip = _laserAudioClip;
-        _playerAudioSource.Play();
+                //Play laser audio
+                _playerAudioSource.clip = _laserAudioClip;
+                _playerAudioSource.Play();
+            }
+        }
     }
 
     public void Stunned(float duration)
@@ -305,6 +317,11 @@ public class Player : MonoBehaviour
         if (_shieldStrengthGO == null)
         {
             Debug.Log("Player::DoNullChecks - _shieldStrengthGO is null!");
+        }
+
+        if (_ammoChargeGO == null)
+        {
+            Debug.Log("Player::DoNullChecks - _ammoChargeGO is null!");
         }
     }
 
