@@ -12,7 +12,7 @@ public class Powerup : MonoBehaviour
     private AudioClip _powerupAudioClip;
     private AudioSource _powerupAudioSource;
 
-    //Powerup ID values: 0 - Triple Shot | 1 - Speed | 2 - Shield
+    //Powerup ID values: 0 - Triple Shot | 1 - Speed | 2 - Shield | 3 - Ammo Recharge
     [SerializeField]
     private int _powerupID;
 
@@ -75,6 +75,9 @@ public class Powerup : MonoBehaviour
                     case 2:  //Shield
                         player.ShieldActive();
                         break;
+                    case 3:  //Ammo recharge
+                        player.RefillAmmoCharge();
+                        break;
                     default:  //powerupID value is unexpected
                         Debug.Log("powerupID value is unexpected!");
                         break;
@@ -88,7 +91,18 @@ public class Powerup : MonoBehaviour
             _powerupAudioSource.clip = _powerupAudioClip;
             _powerupAudioSource.Play();
 
-            transform.GetComponent<SpriteRenderer>().enabled = false;
+            if (_powerupID < 3)
+            {
+                transform.GetComponent<SpriteRenderer>().enabled = false;
+            } else
+            {
+                SpriteRenderer[] powerupImages = transform.GetComponentsInChildren<SpriteRenderer>();
+                foreach (SpriteRenderer currentSpriteRenderer in powerupImages)
+                {
+                    currentSpriteRenderer.enabled = false;
+                } 
+            }
+            
             Destroy(this.gameObject, 1f);
         }
     }

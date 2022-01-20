@@ -20,6 +20,8 @@ public class SpawnManager : MonoBehaviour
     private GameObject _powerupSpeedBoostGO;
     [SerializeField]
     private GameObject _powerupShieldGO;
+    [SerializeField]
+    private GameObject _powerupAmmoRechargeGO;
 
     private bool _isDead = false;
 
@@ -42,6 +44,7 @@ public class SpawnManager : MonoBehaviour
         StartCoroutine(SpawnTripleShotRoutine(_powerupTripleShotGO, _defaultSpawnPosition, 7f, 15f));
         StartCoroutine(SpawnSpeedBoostRoutine(_powerupSpeedBoostGO, _defaultSpawnPosition, 12f, 25f));
         StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 18f, 45f));
+        StartCoroutine(SpawnAmmoChargeRoutine(_powerupAmmoRechargeGO, _defaultSpawnPosition, 15f, 25f));
     }
 
     IEnumerator SpawnEnemyRoutine(GameObject spawnedGameObject, Vector3 spawnPosition, int spawnInterval)
@@ -62,7 +65,7 @@ public class SpawnManager : MonoBehaviour
 
         yield return new WaitForSeconds(3.0f);
 
-        //Spawn powerup accoring to the intervals passed in
+        //Spawn powerup according to the intervals passed in
         while (_isDead == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
@@ -77,7 +80,7 @@ public class SpawnManager : MonoBehaviour
 
         yield return new WaitForSeconds(3.0f);
 
-        //Spawn powerup accoring to the intervals passed in
+        //Spawn powerup according to the intervals passed in
         while (_isDead == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
@@ -92,7 +95,22 @@ public class SpawnManager : MonoBehaviour
 
         yield return new WaitForSeconds(3.0f);
 
-        //Spawn powerup accoring to the intervals passed in
+        //Spawn powerup according to the intervals passed in
+        while (_isDead == false)
+        {
+            yield return new WaitForSeconds(randSpawnInterval);
+            GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
+            newPowerupGO.transform.parent = _powerupsContainer.transform;
+        }
+    }
+
+    IEnumerator SpawnAmmoChargeRoutine(GameObject spawnedGameObject, Vector3 spawnPosition, float spawnInterval1, float spawnInterval2)
+    {
+        float randSpawnInterval = Random.Range(spawnInterval1, spawnInterval2);
+
+        yield return new WaitForSeconds(3.0f);
+
+        //Spawn powerup according to the intervals passed in
         while (_isDead == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);

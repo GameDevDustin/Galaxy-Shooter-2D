@@ -287,6 +287,13 @@ public class Player : MonoBehaviour
         UIManagerScript.UpdatePlayerScore(_playerScore);
     }
 
+    public void RefillAmmoCharge()
+    {
+        _ammoChargeCount = 15;
+        _ammoChargeSize = 120;
+        _ammoChargeGO.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _ammoChargeSize);
+    }
+
     private void DoNullChecks()
     {
         if (_spawnManager == null)

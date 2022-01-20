@@ -1108,6 +1108,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 796326376}
   m_CullTransparentMesh: 1
+--- !u!1001 &808060834
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8019960286563857142, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_Name
+      value: Triple_Shot_Powerup
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_RootOrder
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8019960286563857149, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
 --- !u!1 &1020304810
 GameObject:
   m_ObjectHideFlags: 0
@@ -1906,6 +1963,7 @@ MonoBehaviour:
   _powerupTripleShotGO: {fileID: 8019960286563857142, guid: 8582ceb5896fa704ba096d606f58e529, type: 3}
   _powerupSpeedBoostGO: {fileID: 2192767772612103564, guid: 2260fe4d73d6b154ca711219dfbf05f1, type: 3}
   _powerupShieldGO: {fileID: 1765688930881956614, guid: a87568f63cfacf8428769a1f7eda5851, type: 3}
+  _powerupAmmoRechargeGO: {fileID: 6121407285641117648, guid: 4a50e7c68df06a64bb754d10e45b369d, type: 3}
 --- !u!4 &1772871851
 Transform:
   m_ObjectHideFlags: 0
