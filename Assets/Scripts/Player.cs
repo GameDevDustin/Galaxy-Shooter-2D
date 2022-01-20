@@ -43,44 +43,27 @@ public class Player : MonoBehaviour
     [SerializeField]
     private AudioClip _laserAudioClip;
     private AudioSource _playerAudioSource;
+    [SerializeField]
+    private GameObject _shieldStrengthGO;
+    [SerializeField]
+    private GameObject _shieldStrengthTextGO;
+    [SerializeField]
+    private int _shieldPower = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-       
         transform.position = new Vector3(0, -3, 0);
 
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
 
-        if (_spawnManager == null)
-        {
-            Debug.Log("Player:: Start() - _spawnManager is null!");
-        }
-
         _playerAudioSource = transform.GetComponent<AudioSource>();
 
-        if (_playerAudioSource == null)
-        {
-            Debug.Log("Player:: Start() - _playerAudioSource is null!");
-        }
-
-        if (_laserAudioClip == null)
-        {
-            Debug.Log("Player:: Start() - _laserAudioClip is null!");
-        }
+        DoNullChecks();
 
         if (UIManagerCanvas != null)
         {
             UIManagerScript = UIManagerCanvas.GetComponent<UIManager>();
-        }
-        else
-        {
-            Debug.Log("UI Manager canvas game object not assigned!");
-        }
-
-        if (_gameManager == null)
-        {
-            Debug.Log("Player script Start() found _gameManager to be null!");
         }
     }
 
@@ -198,13 +181,29 @@ public class Player : MonoBehaviour
         if (_shieldActive == false)  
         {
             _shieldActive = true;
+            _shieldPower = 3;
+            _shieldStrengthTextGO.GetComponent<TMP_Text>().text = _shieldPower.ToString();
             _playerShieldGO = Instantiate(_playerShieldPrefabGO, this.transform);
+            _shieldStrengthGO.SetActive(true);
+        }
+    }
+
+    public void ShieldDeactivate()
+    {
+        if (_shieldActive == true)
+        {
+            _shieldActive = false;
+            if (_playerShieldGO != null)
+            {
+                Destroy(_playerShieldGO);
+            }
+            _shieldStrengthGO.SetActive(false);
         }
     }
 
     public void LoseLife()
     {
-        if (_shieldActive != true)
+        if (_shieldActive == false)
         {
             _playerLives -= 1;
 
@@ -229,8 +228,18 @@ public class Player : MonoBehaviour
             UpdatePlayerScore(-1000);
         } else
         {
-            _shieldActive = false;
-            Destroy(_playerShieldGO);
+            if (_shieldPower > 0)
+            {
+                _shieldPower -= 1;
+                _shieldStrengthTextGO.GetComponent<TMP_Text>().text = _shieldPower.ToString();
+
+                if (_shieldPower == 0) {
+                    ShieldDeactivate();
+                }
+            } else
+            {
+                Debug.Log("Player::LoseLife() - _shieldpower is 0 when it should have a value!");
+            }
         }
 
         //check if dead
@@ -264,6 +273,39 @@ public class Player : MonoBehaviour
     {
         _playerScore += addToPlayerScore;
         UIManagerScript.UpdatePlayerScore(_playerScore);
+    }
+
+    private void DoNullChecks()
+    {
+        if (_spawnManager == null)
+        {
+            Debug.Log("Player::DoNullChecks - _spawnManager is null!");
+        }
+
+        if (_playerAudioSource == null)
+        {
+            Debug.Log("Player::DoNullChecks - _playerAudioSource is null!");
+        }
+
+        if (_laserAudioClip == null)
+        {
+            Debug.Log("Player::DoNullChecks - _laserAudioClip is null!");
+        }
+
+        if (UIManagerCanvas == null)
+        {
+            Debug.Log("Player::DoNullChecks - _UIManagerCanvas is null!");
+        }
+
+        if (_gameManager == null)
+        {
+            Debug.Log("Player::DoNullChecks - _gameManager is null!");
+        }
+
+        if (_shieldStrengthGO == null)
+        {
+            Debug.Log("Player::DoNullChecks - _shieldStrengthGO is null!");
+        }
     }
 
 }
