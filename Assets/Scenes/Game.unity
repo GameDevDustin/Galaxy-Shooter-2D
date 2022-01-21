@@ -1748,6 +1748,7 @@ MonoBehaviour:
   _powerupShieldGO: {fileID: 1765688930881956614, guid: a87568f63cfacf8428769a1f7eda5851, type: 3}
   _powerupAmmoRechargeGO: {fileID: 6121407285641117648, guid: 4a50e7c68df06a64bb754d10e45b369d, type: 3}
   _powerupHealthGO: {fileID: 3732515246344875925, guid: f42f8e967b521dc409173d4e40689536, type: 3}
+  _powerupLaserBurstGO: {fileID: 7822306810690024188, guid: 606ad9987d0060540a3eda29ee648b7b, type: 3}
 --- !u!4 &1772871851
 Transform:
   m_ObjectHideFlags: 0
@@ -1756,7 +1757,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1772871849}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.89343417, y: 2.8566341, z: -2.0087128}
+  m_LocalPosition: {x: 6.01, y: 2.8566341, z: -2.0087128}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2021,7 +2022,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8227510598685980567, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.1599998
+      value: -2.52
       objectReference: {fileID: 0}
     - target: {fileID: 8227510598685980567, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
       propertyPath: m_LocalPosition.z

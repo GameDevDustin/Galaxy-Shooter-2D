@@ -15,9 +15,15 @@ public class Player : MonoBehaviour
     private GameObject _laserPrefab;
     [SerializeField]
     private float _laserFireRate = 0.2f;
+    private float _nextLaserFireTimeStamp = -1f;
+    [SerializeField]
+    private GameObject _laserBurstPrefab;
+    [SerializeField]
+    private float _laserBurstFireRate = 0.2f;
+    [SerializeField]
+    private bool _laserBurstActive = false;
     [SerializeField]
     private float _tripleShotFireRate = 0.35f;
-    private float _nextLaserFireTimeStamp = -1f;
     private float _noLogerStunnedTimeStamp = -1f;
     [SerializeField]
     private int _playerLives = 3;
@@ -82,11 +88,12 @@ public class Player : MonoBehaviour
         {
             CalcMovement();
         }
+
         //Fire laser at appropriate fire rate
         if (Input.GetButton("Fire1") && Time.time > _nextLaserFireTimeStamp)
         {
             FireLaser();
-         }
+        } 
     } 
 
     void CalcMovement()
@@ -132,13 +139,25 @@ public class Player : MonoBehaviour
 
     void FireLaser()
     {
-        //Fire triple shot?
-        if (_tripleShotActive == true) {
+        
+        if (_laserBurstActive == true) {
+            //_nextLaserBurstFireTimeStamp = Time.time + _laserBurstFireRate;
+            _nextLaserFireTimeStamp = Time.time + _laserFireRate;
+            Instantiate(_laserBurstPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
+            //Play laser audio
+            _playerAudioSource.clip = _laserAudioClip;
+            _playerAudioSource.Play();
+        } 
+        else if (_tripleShotActive == true)
+        {
             _nextLaserFireTimeStamp = Time.time + _tripleShotFireRate;
             Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
             Instantiate(_laserPrefab, transform.position + new Vector3(-0.782f, -0.425f, 0), Quaternion.identity);
             Instantiate(_laserPrefab, transform.position + new Vector3(0.786f, -0.425f, 0), Quaternion.identity);
-        } 
+            //Play laser audio
+            _playerAudioSource.clip = _laserAudioClip;
+            _playerAudioSource.Play();
+        }
         else //Fire standard laser
         {
             if(_ammoChargeCount > 0)
@@ -148,12 +167,12 @@ public class Player : MonoBehaviour
                 _ammoChargeCount -= 1;
                 _ammoChargeSize -= 8;
                 _ammoChargeGO.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _ammoChargeSize);
-
                 //Play laser audio
                 _playerAudioSource.clip = _laserAudioClip;
                 _playerAudioSource.Play();
             }
         }
+
     }
 
     public void Stunned(float duration)
@@ -170,8 +189,20 @@ public class Player : MonoBehaviour
 
     IEnumerator TripleShotPowerDown()
     {
-        yield return new WaitForSeconds(5.0f);
+        yield return new WaitForSeconds(5f);
         _tripleShotActive = false;
+    }
+
+    public void LaserBurstActive()
+    {
+        _laserBurstActive = true;
+        StartCoroutine(LaserBurstPowerDown());
+    }
+
+    IEnumerator LaserBurstPowerDown()
+    {
+        yield return new WaitForSeconds(5f);
+        _laserBurstActive = false;
     }
 
     public void SpeedBoostPowerupActive() 

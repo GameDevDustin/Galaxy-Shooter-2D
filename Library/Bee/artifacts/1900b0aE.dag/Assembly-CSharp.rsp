@@ -355,6 +355,7 @@
 "Assets/Scripts/Explosion.cs"
 "Assets/Scripts/GameManager.cs"
 "Assets/Scripts/Laser.cs"
+"Assets/Scripts/LaserBurst.cs"
 "Assets/Scripts/MainMenu/MainMenu.cs"
 "Assets/Scripts/Player.cs"
 "Assets/Scripts/Powerup.cs"

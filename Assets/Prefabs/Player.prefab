@@ -104,9 +104,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerSpeed: 7.36
+  _playerBoostPowerupSpeed: 1
   _playerBoostSpeed: 1
   _laserPrefab: {fileID: 7519260255166633653, guid: 97640acef918278499f4953b2a97ff97, type: 3}
   _laserFireRate: 0.2
+  _laserBurstPrefab: {fileID: 3689802895589692969, guid: 93240dae7e5284a4b8e4c177da7c48e7, type: 3}
+  _laserBurstFireRate: 0.2
   _tripleShotFireRate: 0.35
   _playerLives: 3
   _playerShieldPrefabGO: {fileID: 3823460476574329648, guid: a6b9be9300224654c909ab7ed0ec7bd9, type: 3}
@@ -116,6 +119,12 @@ MonoBehaviour:
   _damagedFire1GO: {fileID: 8227510598137266685}
   _damagedFire2GO: {fileID: 8227510598154834048}
   _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
+  _shieldStrengthGO: {fileID: 0}
+  _shieldStrengthTextGO: {fileID: 0}
+  _shieldPower: 0
+  _ammoChargeGO: {fileID: 0}
+  _ammoChargeCount: 15
+  _ammoChargeSize: 120
 --- !u!61 &1658451042
 BoxCollider2D:
   m_ObjectHideFlags: 0

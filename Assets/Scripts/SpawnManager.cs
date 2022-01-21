@@ -24,6 +24,8 @@ public class SpawnManager : MonoBehaviour
     private GameObject _powerupAmmoRechargeGO;
     [SerializeField]
     private GameObject _powerupHealthGO;
+    [SerializeField]
+    private GameObject _powerupLaserBurstGO;
 
     private bool _isDead = false;
 
@@ -31,7 +33,7 @@ public class SpawnManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        DoNulLChecks();
     }
 
     // Update is called once per frame
@@ -48,6 +50,7 @@ public class SpawnManager : MonoBehaviour
         StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 18f, 45f));
         StartCoroutine(SpawnAmmoChargeRoutine(_powerupAmmoRechargeGO, _defaultSpawnPosition, 15f, 25f));
         StartCoroutine(SpawnHealthRoutine(_powerupHealthGO, _defaultSpawnPosition, 30f, 55f));
+        StartCoroutine(SpawnBurstLaserRoutine(_powerupLaserBurstGO, _defaultSpawnPosition, 55f, 75f));
     }
 
     IEnumerator SpawnEnemyRoutine(GameObject spawnedGameObject, Vector3 spawnPosition, int spawnInterval)
@@ -134,6 +137,69 @@ public class SpawnManager : MonoBehaviour
             yield return new WaitForSeconds(randSpawnInterval);
             GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
             newPowerupGO.transform.parent = _powerupsContainer.transform;
+        }
+    }
+
+    IEnumerator SpawnBurstLaserRoutine(GameObject spawnedGameObject, Vector3 spawnPosition, float spawnInterval1, float spawnInterval2)
+    {
+        float randSpawnInterval = Random.Range(spawnInterval1, spawnInterval2);
+
+        yield return new WaitForSeconds(3.0f);
+
+        //Spawn powerup according to the intervals passed in
+        while (_isDead == false)
+        {
+            yield return new WaitForSeconds(randSpawnInterval);
+            GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
+            newPowerupGO.transform.parent = _powerupsContainer.transform;
+        }
+    }
+
+    private void DoNulLChecks()
+    {
+        if (_enemiesContainer == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _enemiesContainer is null!");
+        }
+
+        if (_enemyGO == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _enemyGO is null!");
+        }
+
+        if (_powerupsContainer == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _powerupsContainer is null!");
+        }
+
+        if (_powerupTripleShotGO == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _powerupTripleShotGO is null!");
+        }
+
+        if (_powerupSpeedBoostGO == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _powerupSpeedBoostGO is null!");
+        }
+
+        if (_powerupShieldGO == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _powerupShieldGO is null!");
+        }
+
+        if (_powerupAmmoRechargeGO == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _powerupAmmoRechargeGO is null!");
+        }
+
+        if (_powerupHealthGO == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _powerupHealthGO is null!");
+        }
+
+        if (_powerupLaserBurstGO == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _powerupLaserBurstGO is null!");        
         }
     }
 
