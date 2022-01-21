@@ -263,10 +263,9 @@ public class Player : MonoBehaviour
                 if (_damagedFire2GO != null)
                 {
                     _damagedFire2GO.GetComponent<DamagedFire>().ActivateDamage();
-                }
-                
+                }              
             }
-
+            ShakeCamera(1f, .5f);
             UIManagerScript.UpdateNumOfLivesDisplay(_playerLives);
             UpdatePlayerScore(-1000);
         } else
@@ -340,6 +339,21 @@ public class Player : MonoBehaviour
         _ammoChargeCount = 15;
         _ammoChargeSize = 120;
         _ammoChargeGO.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _ammoChargeSize);
+    }
+
+    private void ShakeCamera(float duration, float amount)
+    {
+        GameObject mainCameraGO;
+
+        mainCameraGO = GameObject.FindGameObjectWithTag("MainCamera");
+
+        if (mainCameraGO != null)
+        {
+            mainCameraGO.GetComponent<CameraShake>().ShakeCamera(duration, amount);
+        } else
+        {
+            Debug.Log("Player::ShakeCamera() - mainCameraGO is null!");
+        }
     }
 
     private void DoNullChecks()
