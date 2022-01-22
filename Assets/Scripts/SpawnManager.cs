@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class SpawnManager : MonoBehaviour
 {
@@ -26,6 +27,21 @@ public class SpawnManager : MonoBehaviour
     private GameObject _powerupHealthGO;
     [SerializeField]
     private GameObject _powerupLaserBurstGO;
+    [SerializeField]
+    private float _spawnWave2DelayTime = 9999f;
+    [SerializeField]
+    private float _spawnWave3DelayTime = 9999f;
+    [SerializeField]
+    private float _spawnWave4DelayTime = 9999f;
+    [SerializeField]
+    private float _spawnWave5DelayTime = 9999f;
+    [SerializeField]
+    private GameObject _newWaveTextGO;
+    [SerializeField]
+    private bool _start2ndWaveActive = false;
+    private bool _start3rdWaveActive = false;
+    private bool _start4thWaveActive = false;
+    private bool _start5thWaveActive = false;
 
     private bool _isDead = false;
 
@@ -39,29 +55,105 @@ public class SpawnManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        //Spawn enemy waves
+        if (_start2ndWaveActive == true && Time.time > _spawnWave2DelayTime)
+        {
+            _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 2 has begun!");
+            _newWaveTextGO.SetActive(true);
+            StartCoroutine(HideNewWaveText());
+            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 6f, 9f));
+            _start2ndWaveActive = false;
+        }  
+        else if (_start3rdWaveActive == true && Time.time > _spawnWave3DelayTime)
+        {
+            _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 3 has begun!");
+            _newWaveTextGO.SetActive(true);
+            StartCoroutine(HideNewWaveText());
+            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 8f, 12f));
+            _start3rdWaveActive = false;
+        }
+        else if (_start4thWaveActive == true && Time.time > _spawnWave4DelayTime)
+        {
+            _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 4 has begun!");
+            _newWaveTextGO.SetActive(true);
+            StartCoroutine(HideNewWaveText());
+            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 11f, 15f));
+            _start4thWaveActive = false;
+        }
+        else if (_start5thWaveActive == true && Time.time > _spawnWave5DelayTime)
+        {
+            _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 5 has begun!");
+            _newWaveTextGO.SetActive(true);
+            StartCoroutine(HideNewWaveText());
+            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 15f, 19f));
+            _start5thWaveActive = false;
+        }
     }
 
-    public void StartSpawning()
+    public void StartSpawningWave1()
     {
-        StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, _enemySpawnInterval));
-        StartCoroutine(SpawnTripleShotRoutine(_powerupTripleShotGO, _defaultSpawnPosition, 7f, 15f));
-        StartCoroutine(SpawnSpeedBoostRoutine(_powerupSpeedBoostGO, _defaultSpawnPosition, 12f, 25f));
-        StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 18f, 45f));
+        SetWaveTimes();
+        _start2ndWaveActive = true;
+        StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 3f, 7f));
+        StartCoroutine(SpawnTripleShotRoutine(_powerupTripleShotGO, _defaultSpawnPosition, 12f, 25f));
+        StartCoroutine(SpawnSpeedBoostRoutine(_powerupSpeedBoostGO, _defaultSpawnPosition, 19f, 35f));
+        StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 35f, 45f));
         StartCoroutine(SpawnAmmoChargeRoutine(_powerupAmmoRechargeGO, _defaultSpawnPosition, 15f, 25f));
-        StartCoroutine(SpawnHealthRoutine(_powerupHealthGO, _defaultSpawnPosition, 30f, 55f));
+        StartCoroutine(SpawnHealthRoutine(_powerupHealthGO, _defaultSpawnPosition, 35f, 55f));
         StartCoroutine(SpawnBurstLaserRoutine(_powerupLaserBurstGO, _defaultSpawnPosition, 55f, 75f));
     }
 
-    IEnumerator SpawnEnemyRoutine(GameObject spawnedGameObject, Vector3 spawnPosition, int spawnInterval)
+    private void SetWaveTimes()
     {
+        _spawnWave2DelayTime = Time.time + 15f;
+        StartCoroutine(StartNextWave(15f, 2));
+        _spawnWave3DelayTime = Time.time + 45f;
+        StartCoroutine(StartNextWave(45f, 3));
+        _spawnWave4DelayTime = Time.time + 70f;
+        StartCoroutine(StartNextWave(70f, 4));
+        _spawnWave5DelayTime = Time.time + 85f;
+        StartCoroutine(StartNextWave(85f, 5));
+    }
+
+    IEnumerator StartNextWave(float waitSeconds, int wave)
+    {
+        yield return new WaitForSeconds(waitSeconds);
+        switch (wave)
+        {
+            case 2:
+                _start2ndWaveActive = true;
+                break;
+            case 3:
+                _start3rdWaveActive = true;
+                break;
+            case 4:
+                _start4thWaveActive = true;
+                break;
+            case 5:
+                _start5thWaveActive = true;
+                break;
+        }
+    }
+
+    IEnumerator HideNewWaveText()
+    {
+
+        yield return new WaitForSeconds(3f);
+        _newWaveTextGO.SetActive(false);
+
+    }
+
+    IEnumerator SpawnEnemyRoutine(GameObject spawnedGameObject, Vector3 spawnPosition, float spawnInterval1, float spawnInterval2)
+    {
+        float randSpawnInterval = Random.Range(spawnInterval1, spawnInterval2);
+
         yield return new WaitForSeconds(3.0f);
 
         while (_isDead == false)
         {
             GameObject newEnemyGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
             newEnemyGO.transform.parent = _enemiesContainer.transform;
-            yield return new WaitForSeconds(spawnInterval);
+            yield return new WaitForSeconds(randSpawnInterval);
         }
     }
 
@@ -200,6 +292,21 @@ public class SpawnManager : MonoBehaviour
         if (_powerupLaserBurstGO == null)
         {
             Debug.Log("SpawnManager::DoNullChecks() - _powerupLaserBurstGO is null!");        
+        }
+        
+        //if (_newWaveText == null)
+        //{
+        //    Debug.Log("SpawnManager::DoNullChecks() - _newWaveText is null!");
+        //}
+
+        //if(_newWaveText != null)
+        //{
+        //    _newWaveTextGO = _newWaveText.gameObject;
+        //}
+
+        if (_newWaveTextGO == null)
+        {
+            Debug.Log("SpawnManager::DoNullChecks() - _newWaveTextGO is null!");
         }
     }
 

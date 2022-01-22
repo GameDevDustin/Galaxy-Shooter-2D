@@ -43,7 +43,7 @@ public class Asteroid : MonoBehaviour
 
         if (_spawnManager != null)
         {
-            _spawnManager.StartSpawning();
+            _spawnManager.StartSpawningWave1();
         }
         
         Destroy(this.gameObject, 0.25f);
