@@ -61,6 +61,7 @@ public class Player : MonoBehaviour
     private int _ammoChargeCount = 15;
     [SerializeField]
     private float _ammoChargeSize = 120;
+    private GameObject _currentAmmoTextGO;
 
     // Start is called before the first frame update
     void Start()
@@ -70,6 +71,8 @@ public class Player : MonoBehaviour
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
 
         _playerAudioSource = transform.GetComponent<AudioSource>();
+
+        _currentAmmoTextGO = GameObject.Find("CurrentAmmo_text");
 
         DoNullChecks();
 
@@ -166,13 +169,27 @@ public class Player : MonoBehaviour
                 Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
                 _ammoChargeCount -= 1;
                 _ammoChargeSize -= 8;
+
                 _ammoChargeGO.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _ammoChargeSize);
+                UpdateCurrentAmmoTextGO();
+
                 //Play laser audio
                 _playerAudioSource.clip = _laserAudioClip;
                 _playerAudioSource.Play();
             }
         }
 
+    }
+
+    private void UpdateCurrentAmmoTextGO()
+    {
+        if (_ammoChargeCount > 9)
+        {
+            _currentAmmoTextGO.transform.GetComponent<TMP_Text>().SetText(_ammoChargeCount.ToString());
+        } else if (_ammoChargeCount < 10)
+        {
+            _currentAmmoTextGO.transform.GetComponent<TMP_Text>().SetText("  " + _ammoChargeCount.ToString());
+        }
     }
 
     public void Stunned(float duration)
@@ -339,6 +356,7 @@ public class Player : MonoBehaviour
         _ammoChargeCount = 15;
         _ammoChargeSize = 120;
         _ammoChargeGO.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _ammoChargeSize);
+        UpdateCurrentAmmoTextGO();
     }
 
     private void ShakeCamera(float duration, float amount)
@@ -391,6 +409,11 @@ public class Player : MonoBehaviour
         if (_ammoChargeGO == null)
         {
             Debug.Log("Player::DoNullChecks - _ammoChargeGO is null!");
+        }
+
+        if (_currentAmmoTextGO == null)
+        {
+            Debug.Log("Player::DoNullChecks - _currentAmmoTextGO is null!");
         }
     }
 
