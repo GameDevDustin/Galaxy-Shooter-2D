@@ -2285,6 +2285,8 @@ MonoBehaviour:
   _powerupAmmoRechargeGO: {fileID: 6121407285641117648, guid: 4a50e7c68df06a64bb754d10e45b369d, type: 3}
   _powerupHealthGO: {fileID: 3732515246344875925, guid: f42f8e967b521dc409173d4e40689536, type: 3}
   _powerupLaserBurstGO: {fileID: 7822306810690024188, guid: 606ad9987d0060540a3eda29ee648b7b, type: 3}
+  _powerupAddShieldPowerGO: {fileID: 2526435550141823050, guid: 3b27c5250071dc4449194f277fdc9617, type: 3}
+  _powerupRemoveShieldsGO: {fileID: 1351065823965557745, guid: 4fc39fc78c84c1d4588ee7a5b9b5376f, type: 3}
   _spawnWave2DelayTime: 0
   _spawnWave3DelayTime: 0
   _spawnWave4DelayTime: 0

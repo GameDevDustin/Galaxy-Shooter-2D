@@ -28,6 +28,10 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject _powerupLaserBurstGO;
     [SerializeField]
+    private GameObject _powerupAddShieldPowerGO;
+    [SerializeField]
+    private GameObject _powerupRemoveShieldsGO;
+    [SerializeField]
     private float _spawnWave2DelayTime = 9999f;
     [SerializeField]
     private float _spawnWave3DelayTime = 9999f;
@@ -97,10 +101,12 @@ public class SpawnManager : MonoBehaviour
         StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 3f, 7f));
         StartCoroutine(SpawnTripleShotRoutine(_powerupTripleShotGO, _defaultSpawnPosition, 12f, 25f));
         StartCoroutine(SpawnSpeedBoostRoutine(_powerupSpeedBoostGO, _defaultSpawnPosition, 19f, 35f));
-        StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 35f, 45f));
+        StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 35f, 75f));
         StartCoroutine(SpawnAmmoChargeRoutine(_powerupAmmoRechargeGO, _defaultSpawnPosition, 15f, 25f));
         StartCoroutine(SpawnHealthRoutine(_powerupHealthGO, _defaultSpawnPosition, 35f, 55f));
         StartCoroutine(SpawnBurstLaserRoutine(_powerupLaserBurstGO, _defaultSpawnPosition, 55f, 75f));
+        StartCoroutine(SpawnAddShieldPowerup(_powerupAddShieldPowerGO, _defaultSpawnPosition, 25f, 55f));
+        StartCoroutine(SpawnRemoveShieldsPowerup(_powerupRemoveShieldsGO, _defaultSpawnPosition, 35f, 75f));
     }
 
     private void SetWaveTimes()
@@ -154,6 +160,36 @@ public class SpawnManager : MonoBehaviour
             GameObject newEnemyGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
             newEnemyGO.transform.parent = _enemiesContainer.transform;
             yield return new WaitForSeconds(randSpawnInterval);
+        }
+    }
+
+    IEnumerator SpawnAddShieldPowerup(GameObject spawnedGameObject, Vector3 spawnPosition, float spawnInterval1, float spawnInterval2)
+    {
+        float randSpawnInterval = Random.Range(spawnInterval1, spawnInterval2);
+
+        yield return new WaitForSeconds(3.0f);
+
+        //Spawn powerup according to the intervals passed in
+        while (_isDead == false)
+        {
+            yield return new WaitForSeconds(randSpawnInterval);
+            GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
+            newPowerupGO.transform.parent = _powerupsContainer.transform;
+        }
+    }
+
+    IEnumerator SpawnRemoveShieldsPowerup(GameObject spawnedGameObject, Vector3 spawnPosition, float spawnInterval1, float spawnInterval2)
+    {
+        float randSpawnInterval = Random.Range(spawnInterval1, spawnInterval2);
+
+        yield return new WaitForSeconds(3.0f);
+
+        //Spawn powerup according to the intervals passed in
+        while (_isDead == false)
+        {
+            yield return new WaitForSeconds(randSpawnInterval);
+            GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
+            newPowerupGO.transform.parent = _powerupsContainer.transform;
         }
     }
 

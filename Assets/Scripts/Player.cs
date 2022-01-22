@@ -236,15 +236,29 @@ public class Player : MonoBehaviour
         _playerBoostPowerupSpeed = 1;
     }
 
-    public void ShieldActive()
+    public void ShieldActive(int power)
     {
         if (_shieldActive == false)  
         {
             _shieldActive = true;
-            _shieldPower = 3;
+            _shieldPower = power;
             _shieldStrengthTextGO.GetComponent<TMP_Text>().text = _shieldPower.ToString();
             _playerShieldGO = Instantiate(_playerShieldPrefabGO, this.transform);
             _shieldStrengthGO.SetActive(true);
+        }
+    }
+
+    public void AddShieldPower(int power)
+    {
+        if (_shieldActive == true && _shieldPower < 3)
+        {
+            _shieldPower += power;
+            _shieldStrengthTextGO.GetComponent<TMP_Text>().text = _shieldPower.ToString();
+        }
+        else if (_shieldActive == false)
+        {
+            ShieldActive(1);
+            _shieldStrengthTextGO.GetComponent<TMP_Text>().text = _shieldPower.ToString();
         }
     }
 

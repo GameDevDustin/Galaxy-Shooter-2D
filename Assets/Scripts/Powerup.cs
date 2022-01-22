@@ -13,6 +13,7 @@ public class Powerup : MonoBehaviour
     private AudioSource _powerupAudioSource;
 
     //Powerup ID values: 0 - Triple Shot | 1 - Speed | 2 - Shield | 3 - Health | 4 - Burst Laser | 5 - Ammo Recharge
+    // 6 - Add Shield Power | 7 - Remove Shields
     [SerializeField]
     private int _powerupID;
 
@@ -73,7 +74,7 @@ public class Powerup : MonoBehaviour
                         player.SpeedBoostPowerupActive();
                         break;
                     case 2:  //Shield
-                        player.ShieldActive();
+                        player.ShieldActive(3);
                         break;
                     case 3:  //Health
                         player.AddLives(1);
@@ -84,6 +85,12 @@ public class Powerup : MonoBehaviour
                         break;
                     case 5:  //Ammo recharge
                         player.RefillAmmoCharge();
+                        break;
+                    case 6:  //Add Shield Power
+                        player.AddShieldPower(1);
+                        break;
+                    case 7:  //Remove shields
+                        player.ShieldDeactivate();
                         break;
                     default:  //powerupID value is unexpected
                         Debug.Log("powerupID value is unexpected!");
