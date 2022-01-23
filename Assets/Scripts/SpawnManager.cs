@@ -98,15 +98,15 @@ public class SpawnManager : MonoBehaviour
     {
         SetWaveTimes();
         _start2ndWaveActive = true;
-        StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 3f, 12f));
+        StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 3f, 9f));
         StartCoroutine(SpawnTripleShotRoutine(_powerupTripleShotGO, _defaultSpawnPosition, 12f, 25f));
         StartCoroutine(SpawnSpeedBoostRoutine(_powerupSpeedBoostGO, _defaultSpawnPosition, 19f, 35f));
-        StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 35f, 75f));
-        StartCoroutine(SpawnAmmoChargeRoutine(_powerupAmmoRechargeGO, _defaultSpawnPosition, 15f, 25f));
+        StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 35f, 65f));
+        StartCoroutine(SpawnAmmoChargeRoutine(_powerupAmmoRechargeGO, _defaultSpawnPosition, 15f, 20f));
         StartCoroutine(SpawnHealthRoutine(_powerupHealthGO, _defaultSpawnPosition, 35f, 55f));
         StartCoroutine(SpawnBurstLaserRoutine(_powerupLaserBurstGO, _defaultSpawnPosition, 55f, 75f));
-        StartCoroutine(SpawnAddShieldPowerup(_powerupAddShieldPowerGO, _defaultSpawnPosition, 25f, 55f));
-        StartCoroutine(SpawnRemoveShieldsPowerup(_powerupRemoveShieldsGO, _defaultSpawnPosition, 35f, 75f));
+        StartCoroutine(SpawnAddShieldPowerup(_powerupAddShieldPowerGO, _defaultSpawnPosition, 25f, 35f));
+        StartCoroutine(SpawnRemoveShieldsPowerup(_powerupRemoveShieldsGO, _defaultSpawnPosition, 20f, 45f));
     }
 
     private void SetWaveTimes()

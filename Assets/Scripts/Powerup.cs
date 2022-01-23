@@ -11,6 +11,9 @@ public class Powerup : MonoBehaviour
     [SerializeField]
     private AudioClip _powerupAudioClip;
     private AudioSource _powerupAudioSource;
+    [SerializeField]
+    private GameObject _playerGO;
+    private Vector3 _towardsPlayerDirection;
 
     //Powerup ID values: 0 - Triple Shot | 1 - Speed | 2 - Shield | 3 - Health | 4 - Burst Laser | 5 - Ammo Recharge
     // 6 - Add Shield Power | 7 - Remove Shields
@@ -20,6 +23,15 @@ public class Powerup : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (GameObject.Find("Player") != null)
+        {
+            _playerGO = GameObject.Find("Player");
+        }
+        else
+        {
+            Debug.Log("Powerup:: Start() - _playerGO is null!");
+        }
+
         if (_powerupAudioClip == null)
         {
             Debug.Log("Powerup:: Start() - _powerupAudioClip is null!");
@@ -45,8 +57,44 @@ public class Powerup : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //move down at 3 meters per second
-        transform.Translate(_powerupDirection * _powerupSpeed * Time.deltaTime);
+        float moveHorizontal;
+        float moveVertical;
+
+        //Use easy collect for powerups
+        if (Input.GetKey(KeyCode.C))
+        {
+            //Determine the direction towards player
+            if (transform.position.x < _playerGO.transform.position.x)
+            {
+                //Move to the right
+                moveHorizontal = 1;
+            }
+            else
+            {
+                //Move to the left
+                moveHorizontal = -1;
+            }
+
+            if (transform.position.y < _playerGO.transform.position.y)
+            {
+                //move up
+                moveVertical = 1;
+            }
+            else
+            {
+                //move down
+                moveVertical = -1;
+            }
+
+            _towardsPlayerDirection = new Vector3(moveHorizontal, moveVertical, 0);
+
+            //Move towards player game object
+            transform.Translate(_towardsPlayerDirection * (_powerupSpeed - 1) * Time.deltaTime);
+        } else
+        {
+            //move down at 3 meters per second
+            transform.Translate(_powerupDirection * _powerupSpeed * Time.deltaTime);
+        }
 
         //if out of lower bounds
         if (transform.position.y < -6f)
