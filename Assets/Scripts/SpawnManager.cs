@@ -65,7 +65,7 @@ public class SpawnManager : MonoBehaviour
             _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 2 has begun!");
             _newWaveTextGO.SetActive(true);
             StartCoroutine(HideNewWaveText());
-            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 6f, 9f));
+            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 6f, 15f));
             _start2ndWaveActive = false;
         }  
         else if (_start3rdWaveActive == true && Time.time > _spawnWave3DelayTime)
@@ -73,7 +73,7 @@ public class SpawnManager : MonoBehaviour
             _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 3 has begun!");
             _newWaveTextGO.SetActive(true);
             StartCoroutine(HideNewWaveText());
-            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 8f, 12f));
+            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 9f, 20f));
             _start3rdWaveActive = false;
         }
         else if (_start4thWaveActive == true && Time.time > _spawnWave4DelayTime)
@@ -81,7 +81,7 @@ public class SpawnManager : MonoBehaviour
             _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 4 has begun!");
             _newWaveTextGO.SetActive(true);
             StartCoroutine(HideNewWaveText());
-            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 11f, 15f));
+            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 11f, 20f));
             _start4thWaveActive = false;
         }
         else if (_start5thWaveActive == true && Time.time > _spawnWave5DelayTime)
@@ -89,7 +89,7 @@ public class SpawnManager : MonoBehaviour
             _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 5 has begun!");
             _newWaveTextGO.SetActive(true);
             StartCoroutine(HideNewWaveText());
-            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 15f, 19f));
+            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 20f, 30f));
             _start5thWaveActive = false;
         }
     }
@@ -98,7 +98,7 @@ public class SpawnManager : MonoBehaviour
     {
         SetWaveTimes();
         _start2ndWaveActive = true;
-        StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 3f, 7f));
+        StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 3f, 12f));
         StartCoroutine(SpawnTripleShotRoutine(_powerupTripleShotGO, _defaultSpawnPosition, 12f, 25f));
         StartCoroutine(SpawnSpeedBoostRoutine(_powerupSpeedBoostGO, _defaultSpawnPosition, 19f, 35f));
         StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 35f, 75f));

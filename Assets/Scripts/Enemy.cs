@@ -26,6 +26,10 @@ public class Enemy : MonoBehaviour
     private GameObject _enemyLaserBeamPrefabGO;
     private GameObject _tempEnemyLaserGO;
     private GameObject _tempEnemyLaserBeamGO;
+    [SerializeField]
+    private GameObject _enemyShieldPrefabGO;
+    private GameObject _tempEnemyShieldGO;
+    private bool _shieldActive = false;
 
     // Enemy Move Types: 0 - Standard | 1 - Diagonal | 2 - Zig Zag | 3 -
     [SerializeField]
@@ -80,6 +84,13 @@ public class Enemy : MonoBehaviour
             default:
                 _enemyDirection = new Vector3(0, -1f, 0);
                 break;
+        }
+
+        //Randomly give enemies shields
+        randomNumber = (int)Random.Range(0, 7);
+        if (randomNumber == 2)
+        {
+            AddShield();
         }
     }
 
@@ -150,16 +161,22 @@ public class Enemy : MonoBehaviour
         //if hits laser
         if (other.tag == "Laser")
         {
-            if (_playerGO != null)
+            if (_shieldActive != true)
             {
-                _playerGO.GetComponent<Player>().UpdatePlayerScore(_scoreValue);
+                if (_playerGO != null)
+                {
+                    _playerGO.GetComponent<Player>().UpdatePlayerScore(_scoreValue);
+                }
+
+                //destroy this enemy game object
+                OnDeath();
+            } else
+            {
+                DeactivateShield();
             }
-            
+
             //destroy  laser game object
             Destroy(other.gameObject);
-
-            //destroy this enemy game object
-            OnDeath();
         }
     }
 
@@ -241,6 +258,18 @@ public class Enemy : MonoBehaviour
         Destroy(_tempEnemyLaserBeamGO);
     }
 
+    private void AddShield()
+    {
+        _tempEnemyShieldGO = Instantiate(_enemyShieldPrefabGO, transform);
+        _shieldActive = true;
+    }
+
+    private void DeactivateShield()
+    {
+        _shieldActive = false;
+        Destroy(_tempEnemyShieldGO);
+    }
+
     private void OnDeath()
     {
         _isDying = true;
@@ -264,19 +293,19 @@ public class Enemy : MonoBehaviour
 
         if (_enemyAnimator == null)
         {
-            Debug.Log("Enemy::Start() _enemyAnimator is null!");
+            Debug.Log("Enemy:: DoNulLChecks() - _enemyAnimator is null!");
         }
 
         if (_enemyAudioClip == null)
         {
-            Debug.Log("Enemy:: Start() - _enemyAudioClip is null!");
+            Debug.Log("Enemy:: DoNulLChecks() - _enemyAudioClip is null!");
         }
 
         _enemyAudioSource = transform.GetComponent<AudioSource>();
 
         if (_enemyAudioSource == null)
         {
-            Debug.Log("Enemy:: Start() - _enemyAudioSource is null!");
+            Debug.Log("Enemy:: DoNulLChecks() - _enemyAudioSource is null!");
         }
 
         _playerGO = GameObject.FindGameObjectWithTag("Player");
@@ -287,17 +316,22 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            Debug.Log("Enemy:: did not find Player game object!");
+            Debug.Log("Enemy:: DoNulLChecks() - did not find Player game object!");
         }
 
         if (_laserAudioClip == null)
         {
-            Debug.Log("Enemy:: _laserAudioClip is null!");
+            Debug.Log("Enemy:: DoNulLChecks() - _laserAudioClip is null!");
         }
 
         if (_enemyLaserPrefabGO == null)
         {
-            Debug.Log("Enemy:: _enemyLaserPrefabGO is null!");
+            Debug.Log("Enemy:: DoNulLChecks() - _enemyLaserPrefabGO is null!");
+        }
+
+        if (_enemyShieldPrefabGO == null)
+        {
+            Debug.Log("Enemy:: DoNulLChecks() - _enemyShieldPrefabGO is null!");
         }
     }
 }
