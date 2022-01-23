@@ -560,11 +560,6 @@ RectTransform:
   m_AnchoredPosition: {x: -260, y: 191.88}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &429636185 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8227510598154834048, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
-  m_PrefabInstance: {fileID: 8227510598186402806}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &480417911
 GameObject:
   m_ObjectHideFlags: 0
@@ -2238,11 +2233,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1725176946 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8227510598137266685, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
-  m_PrefabInstance: {fileID: 8227510598186402806}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1772871849
 GameObject:
   m_ObjectHideFlags: 0
@@ -2609,10 +2599,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1491060628}
     - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
-      propertyPath: _laserPrefab
-      value: 
-      objectReference: {fileID: 7519260255166633653, guid: 97640acef918278499f4953b2a97ff97, type: 3}
-    - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
       propertyPath: _ammoChargeGO
       value: 
       objectReference: {fileID: 768823545}
@@ -2621,29 +2607,9 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1030845325}
     - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
-      propertyPath: _ShieldStrength
-      value: 
-      objectReference: {fileID: 411862738}
-    - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
-      propertyPath: _damagedFire1GO
-      value: 
-      objectReference: {fileID: 1725176946}
-    - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
-      propertyPath: _damagedFire2GO
-      value: 
-      objectReference: {fileID: 429636185}
-    - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
-      propertyPath: _laserAudioClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
-    - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
       propertyPath: _shieldStrengthGO
       value: 
       objectReference: {fileID: 411862738}
-    - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
-      propertyPath: _playerShieldPrefabGO
-      value: 
-      objectReference: {fileID: 3823460476574329648, guid: a6b9be9300224654c909ab7ed0ec7bd9, type: 3}
     - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
       propertyPath: _shieldStrengthTextGO
       value: 

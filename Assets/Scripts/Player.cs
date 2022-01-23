@@ -388,6 +388,14 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "EnemyLaser")
+        {
+            LoseLife();
+        }
+    }
+
     private void DoNullChecks()
     {
         if (_spawnManager == null)

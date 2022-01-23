@@ -110,6 +110,7 @@ MonoBehaviour:
   _laserFireRate: 0.2
   _laserBurstPrefab: {fileID: 3689802895589692969, guid: 93240dae7e5284a4b8e4c177da7c48e7, type: 3}
   _laserBurstFireRate: 0.2
+  _laserBurstActive: 0
   _tripleShotFireRate: 0.35
   _playerLives: 3
   _playerShieldPrefabGO: {fileID: 3823460476574329648, guid: a6b9be9300224654c909ab7ed0ec7bd9, type: 3}
@@ -138,7 +139,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.04382491}
+  m_Offset: {x: 0, y: 0.013126254}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -149,7 +150,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 3.1916924, y: 3.805244}
+  m_Size: {x: 3.1916924, y: 3.9216945}
   m_EdgeRadius: 0
 --- !u!95 &1658451046
 Animator:

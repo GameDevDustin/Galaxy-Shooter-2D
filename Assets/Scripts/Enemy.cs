@@ -18,10 +18,26 @@ public class Enemy : MonoBehaviour
     private AudioSource _enemyAudioSource;
     [SerializeField]
     private AudioClip _enemyAudioClip;
+    [SerializeField]
+    private AudioClip _laserAudioClip;
+    [SerializeField]
+    private GameObject _enemyLaserPrefabGO;
+    [SerializeField]
+    private GameObject _enemyLaserBeamPrefabGO;
+    private GameObject _tempEnemyLaserGO;
+    private GameObject _tempEnemyLaserBeamGO;
 
     // Enemy Move Types: 0 - Standard | 1 - Diagonal | 2 - Zig Zag | 3 -
     [SerializeField]
     private int _enemyMoveType = 0;
+
+    //Enemy Firing Types: 0 - Standard (Not firing) | 1 - Laser | 2 - Beam Laser
+    [SerializeField]
+    private int _enemyFiringType = 0;
+
+    private float _randomFiringTime;
+    private float _nextFiringTime = 3f;
+    private float _nextBeamFiringTime = 5f;
 
 
     // Start is called before the first frame update
@@ -38,6 +54,17 @@ public class Enemy : MonoBehaviour
 
         //Randomly assign enemy move type
         _enemyMoveType = Random.Range(0, 3);
+
+        //Randomly assign enemy firing type
+        _enemyFiringType = Random.Range(0, 2);
+
+        //Weight odds of changing to the BeamLaser enemy randomly
+        int randomNumber = (int)Random.Range(0, 5);
+
+        if (randomNumber == 4 && _enemyMoveType != 0)
+        {
+            _enemyFiringType = 2;
+        }
 
         switch (_enemyMoveType)
         {
@@ -76,6 +103,29 @@ public class Enemy : MonoBehaviour
                 break;
         }
 
+        switch (_enemyFiringType)
+        {
+            case 0:  //Does not fire
+
+                break;
+            case 1:  //Regular laser fire
+                if (Time.time > _nextFiringTime)
+                {
+                    FireLaser();
+                }
+                break;
+
+            case 2:  //Fire beam
+                if (Time.time > _nextBeamFiringTime)
+                {
+                    FireBeam();
+                }
+                break;
+            default:  //Does not fire
+
+                break;
+        }
+
         RespawnAtTop();
     }
 
@@ -100,8 +150,11 @@ public class Enemy : MonoBehaviour
         //if hits laser
         if (other.tag == "Laser")
         {
-            _playerGO.GetComponent<Player>().UpdatePlayerScore(_scoreValue);
-
+            if (_playerGO != null)
+            {
+                _playerGO.GetComponent<Player>().UpdatePlayerScore(_scoreValue);
+            }
+            
             //destroy  laser game object
             Destroy(other.gameObject);
 
@@ -157,6 +210,37 @@ public class Enemy : MonoBehaviour
         transform.Translate(_enemyDirection * _enemySpeed * Time.deltaTime);
     }
 
+    private void FireLaser()
+    {
+        _randomFiringTime = Random.Range(3f, 9f);
+        _nextFiringTime = Time.time + _randomFiringTime;
+
+        _tempEnemyLaserGO = Instantiate(_enemyLaserPrefabGO, transform.position + new Vector3(0, -1.9f, 0), Quaternion.identity);
+        _tempEnemyLaserGO.GetComponent<Laser>().SetSpeed(4);
+
+        //Play laser audio
+        _enemyAudioSource.clip = _laserAudioClip;
+        _enemyAudioSource.Play();
+    }
+
+    private void FireBeam()
+    {
+        _randomFiringTime = Random.Range(5f, 12f);
+        _nextBeamFiringTime = Time.time + _randomFiringTime;
+
+        _tempEnemyLaserBeamGO = Instantiate(_enemyLaserBeamPrefabGO, transform.position + new Vector3(0, -10.5f, 0), Quaternion.identity);
+        _tempEnemyLaserBeamGO.transform.parent = transform;
+
+        StartCoroutine(BeamLaserCooldown(5f));
+    }
+
+    private IEnumerator BeamLaserCooldown(float delay)
+    {
+
+        yield return new WaitForSeconds(delay);
+        Destroy(_tempEnemyLaserBeamGO);
+    }
+
     private void OnDeath()
     {
         _isDying = true;
@@ -164,6 +248,11 @@ public class Enemy : MonoBehaviour
         this.GetComponent<BoxCollider2D>().enabled = false;
         _enemyAudioSource.clip = _enemyAudioClip;
         _enemyAudioSource.Play();
+
+        if (_enemyFiringType == 2)
+        {
+            Destroy(_tempEnemyLaserBeamGO);
+        }
         
         //destroy this enemy game object
         Destroy(this.gameObject, 2.5f);
@@ -198,7 +287,17 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            Debug.Log("Enemy script did not find Player game object!");
+            Debug.Log("Enemy:: did not find Player game object!");
+        }
+
+        if (_laserAudioClip == null)
+        {
+            Debug.Log("Enemy:: _laserAudioClip is null!");
+        }
+
+        if (_enemyLaserPrefabGO == null)
+        {
+            Debug.Log("Enemy:: _enemyLaserPrefabGO is null!");
         }
     }
 }

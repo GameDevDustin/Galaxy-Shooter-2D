@@ -53,6 +53,11 @@ MonoBehaviour:
   _playerGO: {fileID: 0}
   _scoreValue: 250
   _enemyAudioClip: {fileID: 8300000, guid: a885c043fab7e46438bba03ba9dab6bc, type: 3}
+  _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
+  _enemyLaserPrefabGO: {fileID: 4079974184990955374, guid: e57b0e672bc0c304480dd233c911f8fa, type: 3}
+  _enemyLaserBeamPrefabGO: {fileID: 8515241960213160568, guid: a70773b98731b3a46ba8c19f6490f226, type: 3}
+  _enemyMoveType: 0
+  _enemyFiringType: 0
 --- !u!212 &-9049938201073095684
 SpriteRenderer:
   m_ObjectHideFlags: 0
