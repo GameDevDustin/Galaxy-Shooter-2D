@@ -57,8 +57,13 @@ MonoBehaviour:
   _enemyLaserPrefabGO: {fileID: 4079974184990955374, guid: e57b0e672bc0c304480dd233c911f8fa, type: 3}
   _enemyLaserBeamPrefabGO: {fileID: 8515241960213160568, guid: a70773b98731b3a46ba8c19f6490f226, type: 3}
   _enemyShieldPrefabGO: {fileID: 4057875910810493717, guid: d269bdbcd7fb217469059a0aaeceec5e, type: 3}
+  _shieldActive: 0
   _enemyMoveType: 0
   _enemyFiringType: 0
+  _playerNearby: 0
+  _withinPlayerTrackingDistance: 6
+  _playerAttractionSpeed: 3
+  _enemyRotationSpeed: 25
 --- !u!212 &-9049938201073095684
 SpriteRenderer:
   m_ObjectHideFlags: 0

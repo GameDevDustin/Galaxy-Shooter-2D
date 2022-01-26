@@ -29,6 +29,7 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private GameObject _enemyShieldPrefabGO;
     private GameObject _tempEnemyShieldGO;
+    [SerializeField]
     private bool _shieldActive = false;
 
     // Enemy Move Types: 0 - Standard | 1 - Diagonal | 2 - Zig Zag | 3 -
@@ -42,6 +43,16 @@ public class Enemy : MonoBehaviour
     private float _randomFiringTime;
     private float _nextFiringTime = 3f;
     private float _nextBeamFiringTime = 5f;
+
+    [SerializeField]
+    private bool _playerNearby = false;
+    private Vector3 _towardsPlayerDirection;
+    [SerializeField]
+    private float _withinPlayerTrackingDistance = 4;
+    [SerializeField]
+    private float _playerAttractionSpeed = 3;
+    private bool _playerDied = false;
+    private bool _disableEnemyFiring = false;
 
 
     // Start is called before the first frame update
@@ -59,6 +70,14 @@ public class Enemy : MonoBehaviour
         //Randomly assign enemy move type
         _enemyMoveType = Random.Range(0, 3);
 
+
+        //Force enemyMoveType
+        //_enemyMoveType = 1;
+
+        //***TODO*** ^ don't leave force enemyMoveType on after testing
+
+
+
         //Randomly assign enemy firing type
         _enemyFiringType = Random.Range(0, 2);
 
@@ -69,6 +88,13 @@ public class Enemy : MonoBehaviour
         {
             _enemyFiringType = 2;
         }
+
+        //Force enemyFiringType
+        //_enemyFiringType = 2;
+
+        //***TODO*** ^ don't leave force enemyMoveType on after testing
+
+
 
         switch (_enemyMoveType)
         {
@@ -97,44 +123,61 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Move based on _enemyMoveType
-        switch (_enemyMoveType)
+        if(_playerDied == false)
         {
-            case 0:
-                MoveStandard();
-                break;
-            case 1:
-                MoveDiagonallyDown();
-                break;
-            case 2:
-                MoveZigZag();
-                break;
-            default:
-                MoveStandard();
-                break;
+            CheckPlayerDistance();
         }
 
-        switch (_enemyFiringType)
+        if (_playerNearby == true && _playerDied == false && _isDying == false)
         {
-            case 0:  //Does not fire
+            _disableEnemyFiring = true;
 
-                break;
-            case 1:  //Regular laser fire
-                if (Time.time > _nextFiringTime)
-                {
-                    FireLaser();
-                }
-                break;
+            RamPlayer();
+        }
+        else
+        {
+            //Move based on _enemyMoveType
+            switch (_enemyMoveType)
+            {
+                case 0:
+                    MoveStandard();
+                    break;
+                case 1:
+                    MoveDiagonallyDown();
+                    break;
+                case 2:
+                    MoveZigZag();
+                    break;
+                default:
+                    MoveStandard();
+                    break;
+            }
+        }
 
-            case 2:  //Fire beam
-                if (Time.time > _nextBeamFiringTime)
-                {
-                    FireBeam();
-                }
-                break;
-            default:  //Does not fire
+        if(_disableEnemyFiring == false)
+        {
+            switch (_enemyFiringType)
+            {
+                case 0:  //Does not fire
 
-                break;
+                    break;
+                case 1:  //Regular laser fire
+                    if (Time.time > _nextFiringTime)
+                    {
+                        FireLaser();
+                    }
+                    break;
+
+                case 2:  //Fire beam
+                    if (Time.time > _nextBeamFiringTime)
+                    {
+                        FireBeam();
+                    }
+                    break;
+                default:  //Does not fire
+
+                    break;
+            }
         }
 
         RespawnAtTop();
@@ -190,6 +233,7 @@ public class Enemy : MonoBehaviour
         {
             //respawn at top with a new random x position at top of screen
             transform.position = _startingPosition + new Vector3(randomX, 0, 0);
+            transform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
 
@@ -242,7 +286,7 @@ public class Enemy : MonoBehaviour
 
     private void FireBeam()
     {
-        _randomFiringTime = Random.Range(5f, 12f);
+        _randomFiringTime = Random.Range(3f, 6f);
         _nextBeamFiringTime = Time.time + _randomFiringTime;
 
         _tempEnemyLaserBeamGO = Instantiate(_enemyLaserBeamPrefabGO, transform.position + new Vector3(0, -10.5f, 0), Quaternion.identity);
@@ -287,6 +331,87 @@ public class Enemy : MonoBehaviour
         Destroy(this.gameObject, 2.5f);
     }
 
+    private void RamPlayer()
+    {
+        float moveHorizontal;
+        float moveVertical;
+        bool playerOnRight;
+
+        //Determine the direction towards player
+        if (transform.position.x < _playerGO.transform.position.x)
+        {
+            //Move to the right
+            moveHorizontal = 1;
+            playerOnRight = true;
+        }
+        else
+        {
+            //Move to the left
+            moveHorizontal = -1;
+            playerOnRight = false;
+        }
+
+        if (transform.position.y < _playerGO.transform.position.y)
+        {
+            //move up
+            moveVertical = 1;
+        }
+        else
+        {
+            //move down
+            moveVertical = -1;
+        }
+      
+        _towardsPlayerDirection = new Vector3(moveHorizontal, moveVertical, 0);
+
+        //Rotate towards player
+        Vector3 direction = _playerGO.transform.position - transform.position;
+        Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
+        
+        direction.Normalize();
+
+        float rot_z = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, rot_z + 90);
+
+        //Move towards player   
+        transform.Translate(_towardsPlayerDirection * _playerAttractionSpeed * Time.deltaTime);
+    }
+
+    private void CheckPlayerDistance()
+    {
+        float playerY = _playerGO.transform.position.y;
+        float enemyY = transform.position.y;
+
+        float distance = Vector3.Distance(transform.position, _playerGO.transform.position);
+
+        if(distance < _withinPlayerTrackingDistance)
+        {
+            if (playerY < enemyY) 
+            {
+                _playerNearby = true;
+                if(_tempEnemyLaserBeamGO != null)
+                {
+                    Destroy(_tempEnemyLaserBeamGO);
+                }
+            } else
+            {
+                _playerNearby = false;
+                transform.rotation = Quaternion.Euler(0, 0, 0);
+                _disableEnemyFiring = false;
+            }
+        } else
+        {
+            _playerNearby = false;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            _disableEnemyFiring = false;
+        }
+    }
+
+    public void PlayerDied()
+    {
+        _playerDied = true;
+    }
+
     private void DoNullChecks()
     {
         _enemyAnimator = this.GetComponent<Animator>();
@@ -316,6 +441,7 @@ public class Enemy : MonoBehaviour
         }
         else
         {
+            _playerDied = true;
             Debug.Log("Enemy:: DoNulLChecks() - did not find Player game object!");
         }
 

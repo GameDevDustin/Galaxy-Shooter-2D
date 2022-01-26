@@ -325,6 +325,14 @@ public class Player : MonoBehaviour
             }
             else { Debug.Log("_spawnManager = null"); }
 
+            //Tell all enemies player died
+            GameObject[] allEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+            foreach(GameObject enemy in allEnemies)
+            {
+                enemy.GetComponent<Enemy>().PlayerDied();
+            }
+
             if (UIManagerScript != null)
             {
                 UIManagerScript.ShowGameOver();
