@@ -126,6 +126,8 @@ MonoBehaviour:
   _ammoChargeGO: {fileID: 0}
   _ammoChargeCount: 15
   _ammoChargeSize: 120
+  _homingMissilePrefabGO: {fileID: 7473575662773840555, guid: ee20158e2047d9b458dece56df70e816, type: 3}
+  _homingMissile2PrefabGO: {fileID: 7662723463095463400, guid: 3e92988455f26934fb85405654b35d7f, type: 3}
 --- !u!61 &1658451042
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -32,6 +32,8 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject _powerupRemoveShieldsGO;
     [SerializeField]
+    private GameObject _powerupHomingMissileGO;
+    [SerializeField]
     private float _spawnWave2DelayTime = 9999f;
     [SerializeField]
     private float _spawnWave3DelayTime = 9999f;
@@ -107,6 +109,7 @@ public class SpawnManager : MonoBehaviour
         StartCoroutine(SpawnBurstLaserRoutine(_powerupLaserBurstGO, _defaultSpawnPosition, 55f, 75f));
         StartCoroutine(SpawnAddShieldPowerup(_powerupAddShieldPowerGO, _defaultSpawnPosition, 25f, 35f));
         StartCoroutine(SpawnRemoveShieldsPowerup(_powerupRemoveShieldsGO, _defaultSpawnPosition, 20f, 45f));
+        StartCoroutine(SpawnHomingMissilePowerupRoutine(_powerupHomingMissileGO, _defaultSpawnPosition, 25f, 45f));
     }
 
     private void SetWaveTimes()
@@ -147,6 +150,20 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3f);
         _newWaveTextGO.SetActive(false);
 
+    }
+
+    IEnumerator SpawnHomingMissilePowerupRoutine(GameObject spawnedGameObject, Vector3 spawnPosition, float spawnInterval1, float spawnInterval2)
+    {
+        float randSpawnInterval = Random.Range(spawnInterval1, spawnInterval2);
+
+        yield return new WaitForSeconds(3.0f);
+
+        while (_isDead == false)
+        {
+            GameObject newEnemyGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
+            newEnemyGO.transform.parent = _enemiesContainer.transform;
+            yield return new WaitForSeconds(randSpawnInterval);
+        }
     }
 
     IEnumerator SpawnEnemyRoutine(GameObject spawnedGameObject, Vector3 spawnPosition, float spawnInterval1, float spawnInterval2)

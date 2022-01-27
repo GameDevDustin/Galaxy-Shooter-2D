@@ -31,6 +31,8 @@ public class Enemy : MonoBehaviour
     private GameObject _tempEnemyShieldGO;
     [SerializeField]
     private bool _shieldActive = false;
+    [SerializeField]
+    private int _enemyStrength = 1;
 
     // Enemy Move Types: 0 - Standard | 1 - Diagonal | 2 - Zig Zag | 3 -
     [SerializeField]
@@ -94,7 +96,22 @@ public class Enemy : MonoBehaviour
 
         //***TODO*** ^ don't leave force enemyMoveType on after testing
 
+        
 
+        switch (_enemyFiringType)
+        {
+            case 0:  //Does not fire
+                break;
+            case 1:  //Regular laser fire
+                _enemyStrength += 1;
+                break;
+
+            case 2:  //Fire beam
+                _enemyStrength += 3;
+                break;
+            default:  //Does not fire
+                break;
+        }
 
         switch (_enemyMoveType)
         {
@@ -103,9 +120,11 @@ public class Enemy : MonoBehaviour
                 break;
             case 1:  //Diagonal
                 _enemyDirection = new Vector3(1, -0.25f, 0);
+                _enemyStrength += 1;
                 break;
             case 2: //Zig Zag
                 _enemyDirection = new Vector3(-1, -0.25f, 0);
+                _enemyStrength += 2;
                 break;
             default:
                 _enemyDirection = new Vector3(0, -1f, 0);
@@ -117,6 +136,7 @@ public class Enemy : MonoBehaviour
         if (randomNumber == 2)
         {
             AddShield();
+            _enemyStrength += 2;
         }
     }
 
@@ -202,7 +222,7 @@ public class Enemy : MonoBehaviour
         }
   
         //if hits laser
-        if (other.tag == "Laser")
+        if (other.tag == "Laser" || other.tag == "Missile")
         {
             if (_shieldActive != true)
             {
@@ -220,6 +240,11 @@ public class Enemy : MonoBehaviour
 
             //destroy  laser game object
             Destroy(other.gameObject);
+
+            if(other.tag == "Missile")
+            {
+                _playerScript.EnableHomingMissileFiring();
+            }
         }
     }
 
@@ -410,6 +435,11 @@ public class Enemy : MonoBehaviour
     public void PlayerDied()
     {
         _playerDied = true;
+    }
+
+    public int GetEnemyStrength()
+    {
+        return _enemyStrength;
     }
 
     private void DoNullChecks()

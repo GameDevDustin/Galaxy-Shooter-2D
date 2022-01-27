@@ -14,9 +14,10 @@ public class Powerup : MonoBehaviour
     [SerializeField]
     private GameObject _playerGO;
     private Vector3 _towardsPlayerDirection;
+    private bool _disablePickup = false;
 
     //Powerup ID values: 0 - Triple Shot | 1 - Speed | 2 - Shield | 3 - Health | 4 - Burst Laser | 5 - Ammo Recharge
-    // 6 - Add Shield Power | 7 - Remove Shields
+    // 6 - Add Shield Power | 7 - Remove Shields | 8 - Homing Missile
     [SerializeField]
     private int _powerupID;
 
@@ -44,7 +45,7 @@ public class Powerup : MonoBehaviour
             Debug.Log("Powerup:: Start() - _powerupAudioSource is null!");
         }
 
-        //assign starting position immediately to ensure enemy spawns off screen
+        //assign starting position immediately to ensure powerup spawns off screen
         transform.position = _startingPosition;
 
         //X values for powerup position must be between -8.999 and 8.999
@@ -92,7 +93,7 @@ public class Powerup : MonoBehaviour
             transform.Translate(_towardsPlayerDirection * (_powerupSpeed - 1) * Time.deltaTime);
         } else
         {
-            //move down at 3 meters per second
+            //move down
             transform.Translate(_powerupDirection * _powerupSpeed * Time.deltaTime);
         }
 
@@ -109,63 +110,64 @@ public class Powerup : MonoBehaviour
         //if hits player
         if (other.tag == "Player")
         {
-            Player player = other.transform.GetComponent<Player>();
-            if (player != null)
+            if (_disablePickup == false)
             {
-                //Choose action based on PowerupID
-                switch (_powerupID)
+                Player player = other.transform.GetComponent<Player>();
+                if (player != null)
                 {
-                    case 0:  //Triple Shot
-                        player.TripleShotActive();
-                        break;
-                    case 1:  //Speed
-                        player.SpeedBoostPowerupActive();
-                        break;
-                    case 2:  //Shield
-                        player.ShieldActive(3);
-                        break;
-                    case 3:  //Health
-                        player.AddLives(1);
-                        break;
-                    case 4:  //Burst Laser
-                        player.LaserBurstActive();
-                        transform.gameObject.SetActive(false);
-                        break;
-                    case 5:  //Ammo recharge
-                        player.RefillAmmoCharge();
-                        break;
-                    case 6:  //Add Shield Power
-                        player.AddShieldPower(1);
-                        break;
-                    case 7:  //Remove shields
-                        player.ShieldDeactivate();
-                        break;
-                    default:  //powerupID value is unexpected
-                        Debug.Log("powerupID value is unexpected!");
-                        break;
-                }           
-            } 
-            else
-            {
-                Debug.Log("Powerup script did not find Player component on collision other");
-            }
+                    //Choose action based on PowerupID
+                    switch (_powerupID)
+                    {
+                        case 0:  //Triple Shot
+                            player.TripleShotActive();
+                            break;
+                        case 1:  //Speed
+                            player.SpeedBoostPowerupActive();
+                            break;
+                        case 2:  //Shield
+                            player.ShieldActive(3);
+                            break;
+                        case 3:  //Health
+                            player.AddLives(1);
+                            break;
+                        case 4:  //Burst Laser
+                            player.LaserBurstActive();
+                            transform.gameObject.SetActive(false);
+                            break;
+                        case 5:  //Ammo recharge
+                            player.RefillAmmoCharge();
+                            break;
+                        case 6:  //Add Shield Power
+                            player.AddShieldPower(1);
+                            break;
+                        case 7:  //Remove shields
+                            player.ShieldDeactivate();
+                            break;
+                        case 8: //Homing Missile
+                            player.AddHomingMissile();
+                            break;
+                        default:  //powerupID value is unexpected
+                            Debug.Log("powerupID value is unexpected!");
+                            break;
+                    }
+                }
+                else
+                {
+                    Debug.Log("Powerup script did not find Player component on collision other");
+                }
 
-            _powerupAudioSource.clip = _powerupAudioClip;
-            _powerupAudioSource.Play();
+                _powerupAudioSource.clip = _powerupAudioClip;
+                _powerupAudioSource.Play();
 
-            if (_powerupID < 4)
-            {
-                transform.GetComponent<SpriteRenderer>().enabled = false;
-            } else
-            {
                 SpriteRenderer[] powerupImages = transform.GetComponentsInChildren<SpriteRenderer>();
                 foreach (SpriteRenderer currentSpriteRenderer in powerupImages)
                 {
                     currentSpriteRenderer.enabled = false;
-                } 
+                }
+
+                _disablePickup = true;
+                Destroy(this.gameObject, 1f);
             }
-            
-            Destroy(this.gameObject, 1f);
         }
     }
 }
