@@ -360,20 +360,17 @@ public class Enemy : MonoBehaviour
     {
         float moveHorizontal;
         float moveVertical;
-        bool playerOnRight;
 
         //Determine the direction towards player
         if (transform.position.x < _playerGO.transform.position.x)
         {
             //Move to the right
             moveHorizontal = 1;
-            playerOnRight = true;
         }
         else
         {
             //Move to the left
             moveHorizontal = -1;
-            playerOnRight = false;
         }
 
         if (transform.position.y < _playerGO.transform.position.y)

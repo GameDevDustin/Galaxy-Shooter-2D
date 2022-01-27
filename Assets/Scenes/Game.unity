@@ -2730,6 +2730,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 411862738}
     - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
+      propertyPath: _homingMissileSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8227510598685980585, guid: da93e4f97502983458c0f5455f3dcec9, type: 3}
       propertyPath: _shieldStrengthTextGO
       value: 
       objectReference: {fileID: 1071894080}

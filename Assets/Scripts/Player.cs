@@ -71,7 +71,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject[] _homingMissilesGO = new GameObject[2];
     [SerializeField]
-    private float _homingMissileSpeed = 5f;
+    private float _homingMissileSpeed = 10f;
     private bool _moveHomingMissiles = false;
     private bool _missile1Fired = false;
     private bool _missile2Fired = false;
@@ -80,6 +80,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject[] _allEnemiesGO = new GameObject[100];
     private bool _fireHomingMissileCooldownActive = false;
+    private bool _delayAddHomingMissile = false;
 
     // Start is called before the first frame update
     void Start()
@@ -110,12 +111,6 @@ public class Player : MonoBehaviour
             CalcMovement();
         }
 
-        if (_currentHomingMissiles > 0)
-        {
-            //Get all enemy GameObjects on screen so they can be targeted 
-            _allEnemiesGO = GameObject.FindGameObjectsWithTag("Enemy");
-        }
-
         if (_moveHomingMissiles == true)
         {
             MoveHomingMissiles();
@@ -129,10 +124,16 @@ public class Player : MonoBehaviour
 
         if (Input.GetButton("Fire2"))
         {
-            if (_fireHomingMissileCooldownActive == false)
+            if (_fireHomingMissileCooldownActive == false && _currentHomingMissiles > 0)
             {
+                _allEnemiesGO = GameObject.FindGameObjectsWithTag("Enemy");
                 FireHomingMissile();
             }
+        }
+
+        if(_delayAddHomingMissile == true)
+        {
+            DelayAddHomingMissile();
         }
     } 
 
@@ -314,292 +315,216 @@ public class Player : MonoBehaviour
 
     public void AddHomingMissile()
     {
+        //_addHomingMissile = true;
         if(_currentHomingMissiles < 2)
         {
             //Add sprite to player ship
-            if(_currentHomingMissiles == 0)
+            if(_currentHomingMissiles == 0 && _homingMissilesGO[0].gameObject == null)
             {
                 _homingMissilesGO[0] = Instantiate(_homingMissilePrefabGO, transform);
-            } else if (_currentHomingMissiles == 1)
+                _currentHomingMissiles += 1;
+            } else if (_currentHomingMissiles == 1 && _homingMissilesGO[1].gameObject == null)
             {
                 _homingMissilesGO[1] = Instantiate(_homingMissile2PrefabGO, transform);
+                _currentHomingMissiles += 1;
+            } 
+            else
+            {
+                _delayAddHomingMissile = true;
+                _currentHomingMissiles += 1;
             }
-            
-            _currentHomingMissiles += 1;
+        } else if (_currentHomingMissiles == 2)
+        {
+            if (_delayAddHomingMissile == true && _homingMissilesGO[1].gameObject == null)
+            {
+                _homingMissilesGO[1] = Instantiate(_homingMissile2PrefabGO, transform);
+                _delayAddHomingMissile = false;
+            }
         }
+    }
+
+    private void DelayAddHomingMissile()
+    {
+        if(_homingMissilesGO[1].gameObject == null) // || _homingMissilesGO[0].gameObject == null)
+        {
+            AddHomingMissile();
+        } 
     }
 
     private void FireHomingMissile()
     {  
         GameObject targetEnemyGO = null;
+
+        if (_fireHomingMissileCooldownActive == false && _currentHomingMissiles > 0)
+        {
+            targetEnemyGO = UpdateHomingMissileTarget();
+
+            if (targetEnemyGO != null)
+            {
+                if (_currentHomingMissiles == 2)
+                {
+                    _missile2Fired = true;
+                    _enemyMissileTarget2 = targetEnemyGO;
+                    if(_homingMissilesGO[1].transform.parent != null)
+                    {
+                        _homingMissilesGO[1].transform.parent = null;
+                    }
+                    //Give it an initial forward motion
+                    _homingMissilesGO[1].GetComponent<Rigidbody2D>().AddForce(new Vector3(-1f, 0, 0));
+                    _currentHomingMissiles -= 1;
+                    StartCoroutine(FireMissileCooldown());
+                }
+                else if (_currentHomingMissiles == 1)
+                {
+                    _missile1Fired = true;
+                    _enemyMissileTarget1 = targetEnemyGO;
+                    if(_homingMissilesGO[0].transform.parent != null)
+                    {
+                        _homingMissilesGO[0].transform.parent = null;
+                    }
+                    //Give it an initial forward motion
+                    _homingMissilesGO[0].GetComponent<Rigidbody2D>().AddForce(transform.up);
+                    _currentHomingMissiles -= 1;
+                    StartCoroutine(FireMissileCooldown());
+                }
+                else
+                {
+                    Debug.Log("Player::FireHomingMissile() - method called but _currentHomingMissiles != 1 or 2");
+                }
+                _moveHomingMissiles = true;
+            }
+        }
+    }
+
+    private GameObject UpdateHomingMissileTarget()
+    {
         int highestEnemyStrength = -1;
         float targetEnemyDistance = -1;
         float currEnemyDistance = -1;
+        GameObject targetEnemyGO = null;
 
-        if (_fireHomingMissileCooldownActive == false)
+        _allEnemiesGO = GameObject.FindGameObjectsWithTag("Enemy");
+
+        foreach (GameObject enemyGO in _allEnemiesGO)
         {
-            if (_currentHomingMissiles > 0)
+            //Check current enemyGO strength compared to highest strength so far
+            if (enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength() > highestEnemyStrength)
             {
-                foreach (GameObject enemyGO in _allEnemiesGO)
+                //make this the targetEnemy until a better one is found
+                highestEnemyStrength = enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength();
+                targetEnemyGO = enemyGO;
+                targetEnemyDistance = Vector3.Distance(transform.position, targetEnemyGO.transform.position);
+            }
+            else if (enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength() == highestEnemyStrength)
+            {
+                //current enemyGO is = strength to targetEnemyGO, which one is closer?
+                currEnemyDistance = Vector3.Distance(transform.position, enemyGO.transform.position);
+
+                if (targetEnemyDistance != -1)
                 {
-                    //Check current enemyGO strength compared to highest strength so far
-                    if (enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength() > highestEnemyStrength)
+                    if (currEnemyDistance < targetEnemyDistance)
                     {
                         //make this the targetEnemy until a better one is found
                         highestEnemyStrength = enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength();
                         targetEnemyGO = enemyGO;
                         targetEnemyDistance = Vector3.Distance(transform.position, targetEnemyGO.transform.position);
                     }
-                    else if (enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength() == highestEnemyStrength)
-                    {
-                        //current enemyGO is = strength to targetEnemyGO, which one is closer?
-                        currEnemyDistance = Vector3.Distance(transform.position, enemyGO.transform.position);
-
-                        if (targetEnemyDistance != -1)
-                        {
-                            if (currEnemyDistance < targetEnemyDistance)
-                            {
-                                //make this the targetEnemy until a better one is found
-                                highestEnemyStrength = enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength();
-                                targetEnemyGO = enemyGO;
-                                targetEnemyDistance = Vector3.Distance(transform.position, targetEnemyGO.transform.position);
-                            }
-                        }
-                        else
-                        {
-                            targetEnemyGO = _allEnemiesGO[0];
-                            Debug.Log("Player::FireHomingMissile - targetEnemyDistance = -1");
-                        }
-                    }
                 }
-
-                if (targetEnemyGO != null && _currentHomingMissiles > 0)
+                else
                 {
-                    if (_currentHomingMissiles == 2)
-                    {
-                        _missile2Fired = true;
-                        _enemyMissileTarget2 = targetEnemyGO;
-                        _homingMissilesGO[1].transform.parent = null;
-                        _currentHomingMissiles -= 1;
-                        StartCoroutine(FireMissileCooldown());
-                    }
-                    else if (_currentHomingMissiles == 1)
-                    {
-                        _missile1Fired = true;
-                        _enemyMissileTarget1 = targetEnemyGO;
-                        _homingMissilesGO[0].transform.parent = null;
-                        _currentHomingMissiles -= 1;
-                        StartCoroutine(FireMissileCooldown());
-                    }
-                    else
-                    {
-                        Debug.Log("Player::FireHomingMissile() - method called but _currentHomingMissiles != 1 or 2");
-                    }
-                    _moveHomingMissiles = true;
+                    targetEnemyGO = _allEnemiesGO[0];
+                    Debug.Log("Player::FireHomingMissile - targetEnemyDistance = -1");
                 }
-            }
-            else
-            {
-                Debug.Log("Player::FireHomingMissile() - _currentHomingMissiles not > 0");
             }
         }
+        return targetEnemyGO;
     }
 
     private void MoveHomingMissiles()
     {
+        if (_missile2Fired && _homingMissilesGO[1] != null)
+        {
+            //Move missile2
+
+            if (_enemyMissileTarget2 == null)
+            {
+                _enemyMissileTarget2 = UpdateHomingMissileTarget();
+            }
+            MoveHomingMissile(1, _enemyMissileTarget2);
+        }
+        else if (_missile1Fired & _homingMissilesGO[0] != null)
+        {
+            //Move missile1
+
+            if (_enemyMissileTarget1 == null)
+            {
+                _enemyMissileTarget1 = UpdateHomingMissileTarget();
+            }
+            MoveHomingMissile(0, _enemyMissileTarget1);
+        }
+        else
+        {
+            //Debug.Log("Player::MoveHomingMissiles() - method called but _missile1Fired and _missile2Fired are both false");
+        }
+    }
+
+    private void MoveHomingMissile(int missileID, GameObject missileTargetGO)
+    {
         float moveHorizontal;
         float moveVertical;
-        bool missileOnRight;
         Vector3 towardsEnemyDirection;
         Vector3 direction;
         Quaternion targetRotation;
         float rot_z;
 
-        if (_missile1Fired && _missile2Fired)
+        if (missileTargetGO == null)
         {
-            //Move both missiles
-
-            //Move missile 1
-            if (_enemyMissileTarget1 != null && _homingMissilesGO[0] != null)
-            {
-                //Determine the direction towards enemy
-                if (_homingMissilesGO[0].transform.position.x < _enemyMissileTarget1.transform.position.x)
-                {
-                    //Move to the right
-                    moveHorizontal = 1;
-                    missileOnRight = true;
-                }
-                else
-                {
-                    //Move to the left
-                    moveHorizontal = -1;
-                    missileOnRight = false;
-                }
-
-                if (_homingMissilesGO[0].transform.position.y < _enemyMissileTarget1.transform.position.y)
-                {
-                    //move up
-                    moveVertical = 1;
-                }
-                else
-                {
-                    //move down
-                    moveVertical = -1;
-                }
-
-                towardsEnemyDirection = new Vector3(moveHorizontal, moveVertical, 0);
-
-                //Rotate towards enemy
-                direction = _enemyMissileTarget1.transform.position - _homingMissilesGO[0].transform.position;
-                targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
-
-                direction.Normalize();
-
-                rot_z = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                _homingMissilesGO[0].transform.rotation = Quaternion.Euler(0f, 0f, rot_z + 180);
-
-                //Move towards enemy   
-                _homingMissilesGO[0].transform.Translate(towardsEnemyDirection * _homingMissileSpeed * Time.deltaTime);
-            }
-
-            if(_enemyMissileTarget2 != null && _homingMissilesGO[1] != null)
-            {
-                //Move missile 2
-
-
-                //Determine the direction towards enemy
-                if (_homingMissilesGO[1].transform.position.x < _enemyMissileTarget2.transform.position.x)
-                {
-                    //Move to the right
-                    moveHorizontal = 1;
-                    missileOnRight = true;
-                }
-                else
-                {
-                    //Move to the left
-                    moveHorizontal = -1;
-                    missileOnRight = false;
-                }
-
-                if (_homingMissilesGO[1].transform.position.y < _enemyMissileTarget2.transform.position.y)
-                {
-                    //move up
-                    moveVertical = 1;
-                }
-                else
-                {
-                    //move down
-                    moveVertical = -1;
-                }
-
-                towardsEnemyDirection = new Vector3(moveHorizontal, moveVertical, 0);
-
-                //Rotate towards enemy
-                direction = _enemyMissileTarget2.transform.position - _homingMissilesGO[1].transform.position;
-                targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
-
-                direction.Normalize();
-
-                rot_z = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                _homingMissilesGO[1].transform.rotation = Quaternion.Euler(0f, 0f, rot_z + 180);
-
-                //Move towards enemy   
-                _homingMissilesGO[1].transform.Translate(towardsEnemyDirection * _homingMissileSpeed * Time.deltaTime);
-            }
-        } else if (_missile2Fired)
-        {
-            //Move missile2
-
-            if (_enemyMissileTarget2 != null && _homingMissilesGO[1] != null)
-            {
-                //Determine the direction towards enemy
-                if (_homingMissilesGO[1].transform.position.x < _enemyMissileTarget2.transform.position.x)
-                {
-                    //Move to the right
-                    moveHorizontal = 1;
-                    missileOnRight = true;
-                }
-                else
-                {
-                    //Move to the left
-                    moveHorizontal = -1;
-                    missileOnRight = false;
-                }
-
-                if (_homingMissilesGO[1].transform.position.y < _enemyMissileTarget2.transform.position.y)
-                {
-                    //move up
-                    moveVertical = 1;
-                }
-                else
-                {
-                    //move down
-                    moveVertical = -1;
-                }
-
-                towardsEnemyDirection = new Vector3(moveHorizontal, moveVertical, 0);
-
-                //Rotate towards enemy
-                direction = _enemyMissileTarget2.transform.position - _homingMissilesGO[1].transform.position;
-                targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
-
-                direction.Normalize();
-
-                rot_z = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                _homingMissilesGO[1].transform.rotation = Quaternion.Euler(0f, 0f, rot_z + 180);
-
-                //Move towards enemy   
-                _homingMissilesGO[1].transform.Translate(towardsEnemyDirection * _homingMissileSpeed * Time.deltaTime);
-            }
+            missileTargetGO = UpdateHomingMissileTarget();
         }
-        else if (_missile1Fired)
-        {
-            //Move missile1
 
-            if(_enemyMissileTarget1 != null && _homingMissilesGO[0] != null)
+        if (missileTargetGO != null && _homingMissilesGO[missileID] != null)
+        {
+            //Determine the direction towards enemy
+            if (_homingMissilesGO[missileID].transform.position.x < missileTargetGO.transform.position.x)
             {
-                //Determine the direction towards enemy
-                if (_homingMissilesGO[0].transform.position.x < _enemyMissileTarget1.transform.position.x)
-                {
-                    //Move to the right
-                    moveHorizontal = 1;
-                    missileOnRight = true;
-                }
-                else
-                {
-                    //Move to the left
-                    moveHorizontal = -1;
-                    missileOnRight = false;
-                }
-
-                if (_homingMissilesGO[0].transform.position.y < _enemyMissileTarget1.transform.position.y)
-                {
-                    //move up
-                    moveVertical = 1;
-                }
-                else
-                {
-                    //move down
-                    moveVertical = -1;
-                }
-
-                towardsEnemyDirection = new Vector3(moveHorizontal, moveVertical, 0);
-
-                //Rotate towards enemy
-                direction = _enemyMissileTarget1.transform.position - _homingMissilesGO[0].transform.position;
-                targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
-
-                direction.Normalize();
-
-                rot_z = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                _homingMissilesGO[0].transform.rotation = Quaternion.Euler(0f, 0f, rot_z + 180);
-
-                //Move towards enemy  
-                _homingMissilesGO[0].transform.Translate(towardsEnemyDirection * _homingMissileSpeed * Time.deltaTime);
+                //Move to the right
+                moveHorizontal = 1;
             }
-        } else
+            else
+            {
+                //Move to the left
+                moveHorizontal = -1;
+            }
+
+            if (_homingMissilesGO[missileID].transform.position.y < missileTargetGO.transform.position.y)
+            {
+                //move up
+                moveVertical = 1;
+            }
+            else
+            {
+                //move down
+                moveVertical = -1;
+            }
+
+            towardsEnemyDirection = new Vector3(moveHorizontal, moveVertical, 0);
+
+            //Rotate towards enemy
+            direction = missileTargetGO.transform.position - _homingMissilesGO[missileID].transform.position;
+            targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
+
+            direction.Normalize();
+
+            rot_z = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            _homingMissilesGO[missileID].transform.rotation = Quaternion.Euler(0f, 0f, rot_z + -180);
+
+            //Move towards enemy  
+            ///_homingMissilesGO[missileID].transform.Translate(towardsEnemyDirection * _homingMissileSpeed * Time.deltaTime);
+            _homingMissilesGO[missileID].transform.Translate(direction * _homingMissileSpeed * Time.deltaTime);
+        }
+        else
         {
-            Debug.Log("Player::MoveHomingMissiles() - method called but _missile1Fired and _missile2Fired are both false");
+            Debug.Log("Player::MoveHomingMissile(): either missileTargetGO = null or _homingMissilesGO[missileID] = null");
         }
     }
 
@@ -607,12 +532,15 @@ public class Player : MonoBehaviour
     {
         _fireHomingMissileCooldownActive = true;
         yield return new WaitForSeconds(1);
-        //_fireHomingMissileCooldownActive = false;
     }
 
     public void EnableHomingMissileFiring()
     {
-        _fireHomingMissileCooldownActive = false;
+        if(_currentHomingMissiles > 0)
+        {
+            _fireHomingMissileCooldownActive = false;
+        }
+        _moveHomingMissiles = false;
     }
 
     public void LoseLife()
