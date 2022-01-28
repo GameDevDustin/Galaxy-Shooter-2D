@@ -358,37 +358,8 @@ public class Enemy : MonoBehaviour
 
     private void RamPlayer()
     {
-        float moveHorizontal;
-        float moveVertical;
-
-        //Determine the direction towards player
-        if (transform.position.x < _playerGO.transform.position.x)
-        {
-            //Move to the right
-            moveHorizontal = 1;
-        }
-        else
-        {
-            //Move to the left
-            moveHorizontal = -1;
-        }
-
-        if (transform.position.y < _playerGO.transform.position.y)
-        {
-            //move up
-            moveVertical = 1;
-        }
-        else
-        {
-            //move down
-            moveVertical = -1;
-        }
-      
-        _towardsPlayerDirection = new Vector3(moveHorizontal, moveVertical, 0);
-
         //Rotate towards player
         Vector3 direction = _playerGO.transform.position - transform.position;
-        Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
         
         direction.Normalize();
 
@@ -396,7 +367,7 @@ public class Enemy : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, 0f, rot_z + 90);
 
         //Move towards player   
-        transform.Translate(_towardsPlayerDirection * _playerAttractionSpeed * Time.deltaTime);
+        transform.Translate(direction * _playerAttractionSpeed * Time.deltaTime);
     }
 
     private void CheckPlayerDistance()

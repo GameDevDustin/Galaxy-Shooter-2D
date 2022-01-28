@@ -109,7 +109,7 @@ public class SpawnManager : MonoBehaviour
         StartCoroutine(SpawnBurstLaserRoutine(_powerupLaserBurstGO, _defaultSpawnPosition, 55f, 75f));
         StartCoroutine(SpawnAddShieldPowerup(_powerupAddShieldPowerGO, _defaultSpawnPosition, 25f, 35f));
         StartCoroutine(SpawnRemoveShieldsPowerup(_powerupRemoveShieldsGO, _defaultSpawnPosition, 20f, 45f));
-        StartCoroutine(SpawnHomingMissilePowerupRoutine(_powerupHomingMissileGO, _defaultSpawnPosition, 25f, 45f));
+        StartCoroutine(SpawnHomingMissilePowerupRoutine(_powerupHomingMissileGO, _defaultSpawnPosition, 5f, 10f));
     }
 
     private void SetWaveTimes()

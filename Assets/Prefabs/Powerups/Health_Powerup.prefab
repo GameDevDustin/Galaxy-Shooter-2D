@@ -139,6 +139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _powerupSpeed: 3
   _powerupAudioClip: {fileID: 8300000, guid: 5ee343246919d2b4bba63ae629e95494, type: 3}
+  _playerGO: {fileID: 0}
   _powerupID: 3
 --- !u!82 &3314577009364460474
 AudioSource:

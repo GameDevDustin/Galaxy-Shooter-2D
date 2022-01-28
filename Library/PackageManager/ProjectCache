@@ -20,7 +20,7 @@ m_EmbeddedPackageManifests:
 m_LocalPackages:
   m_LocalFileStatus: []
 m_ProjectPath: D:/GameDevHQ/Projects/Galaxy Shooter 2D/Packages
-m_EditorVersion: 2021.2.8f1 (d0e5f0a7b06a)
+m_EditorVersion: 2021.2.9f1 (921b45a28ab6)
 m_ResolvedPackages:
 - packageId: com.unity.2d.sprite@1.0.0
   testable: 0

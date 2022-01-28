@@ -80,7 +80,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject[] _allEnemiesGO = new GameObject[100];
     private bool _fireHomingMissileCooldownActive = false;
-    private bool _delayAddHomingMissile = false;
+    private bool _delayAddHomingMissile1 = false;
+    private bool _delayAddHomingMissile2 = false;
 
     // Start is called before the first frame update
     void Start()
@@ -131,7 +132,7 @@ public class Player : MonoBehaviour
             }
         }
 
-        if(_delayAddHomingMissile == true)
+        if(_delayAddHomingMissile1 == true || _delayAddHomingMissile2 == true)
         {
             DelayAddHomingMissile();
         }
@@ -315,40 +316,76 @@ public class Player : MonoBehaviour
 
     public void AddHomingMissile()
     {
-        //_addHomingMissile = true;
         if(_currentHomingMissiles < 2)
         {
-            //Add sprite to player ship
-            if(_currentHomingMissiles == 0 && _homingMissilesGO[0].gameObject == null)
+            //Add first missile (right side)
+            if(_currentHomingMissiles == 0)
             {
-                _homingMissilesGO[0] = Instantiate(_homingMissilePrefabGO, transform);
-                _currentHomingMissiles += 1;
-            } else if (_currentHomingMissiles == 1 && _homingMissilesGO[1].gameObject == null)
-            {
-                _homingMissilesGO[1] = Instantiate(_homingMissile2PrefabGO, transform);
-                _currentHomingMissiles += 1;
-            } 
-            else
-            {
-                _delayAddHomingMissile = true;
-                _currentHomingMissiles += 1;
+                //_missile1Fired being true means it is still alive but not on the ship
+                if (_missile1Fired || _homingMissilesGO[0].gameObject != null)
+                {
+                    //delay adding the missile
+                    _delayAddHomingMissile1 = true;
+                    _currentHomingMissiles += 1;
+                }
+                else if (_missile1Fired == false && _homingMissilesGO[0].gameObject == null)
+                {
+                    //add missile 1 to right side of player ship
+                    _homingMissilesGO[0] = Instantiate(_homingMissilePrefabGO, transform);
+                    _currentHomingMissiles += 1;
+                    _delayAddHomingMissile1 = false;
+                }
             }
-        } else if (_currentHomingMissiles == 2)
-        {
-            if (_delayAddHomingMissile == true && _homingMissilesGO[1].gameObject == null)
+            else if (_currentHomingMissiles == 1)
             {
-                _homingMissilesGO[1] = Instantiate(_homingMissile2PrefabGO, transform);
-                _delayAddHomingMissile = false;
+                //Is the count 1 because of a delay?
+                if (_delayAddHomingMissile1 == true)
+                {
+                    //Has the original missile 1 that delayed this missile 1 died?
+                    if(_missile1Fired == false && _homingMissilesGO[0].gameObject == null)
+                    {
+                        //add missile 1 to right side of player ship
+                        _homingMissilesGO[0] = Instantiate(_homingMissilePrefabGO, transform);
+                        _delayAddHomingMissile1 = false;
+                    }
+                }
+                else //count is 1, but not because of a delay
+                {
+                    if (_missile2Fired || _homingMissilesGO[1].gameObject != null)
+                    {
+                        //delay adding the missile
+                        _delayAddHomingMissile2 = true;
+                        _currentHomingMissiles += 1;
+                    }
+                    else if (_missile2Fired == false && _homingMissilesGO[1].gameObject == null)
+                    {
+                        //add missile 2 to left side of player ship
+                        _homingMissilesGO[1] = Instantiate(_homingMissile2PrefabGO, transform);
+                        _currentHomingMissiles += 1;
+                        _delayAddHomingMissile2 = false;
+                    }
+                }
+            }
+        }
+        else if (_currentHomingMissiles == 2)
+        {
+            //Is the count 2 because of a delay?
+            if (_delayAddHomingMissile2 == true)
+            {
+                //Has the original missile 2 that delayed this missile 2 died?
+                if (_missile2Fired == false && _homingMissilesGO[1].gameObject == null)
+                {
+                    //add missile 2 to the left side of the player ship
+                    _homingMissilesGO[1] = Instantiate(_homingMissile2PrefabGO, transform);
+                    _delayAddHomingMissile2 = false;
+                }
             }
         }
     }
 
     private void DelayAddHomingMissile()
     {
-        if(_homingMissilesGO[1].gameObject == null) // || _homingMissilesGO[0].gameObject == null)
-        {
             AddHomingMissile();
-        } 
     }
 
     private void FireHomingMissile()
@@ -470,11 +507,7 @@ public class Player : MonoBehaviour
 
     private void MoveHomingMissile(int missileID, GameObject missileTargetGO)
     {
-        float moveHorizontal;
-        float moveVertical;
-        Vector3 towardsEnemyDirection;
         Vector3 direction;
-        Quaternion targetRotation;
         float rot_z;
 
         if (missileTargetGO == null)
@@ -484,47 +517,19 @@ public class Player : MonoBehaviour
 
         if (missileTargetGO != null && _homingMissilesGO[missileID] != null)
         {
-            //Determine the direction towards enemy
-            if (_homingMissilesGO[missileID].transform.position.x < missileTargetGO.transform.position.x)
-            {
-                //Move to the right
-                moveHorizontal = 1;
-            }
-            else
-            {
-                //Move to the left
-                moveHorizontal = -1;
-            }
-
-            if (_homingMissilesGO[missileID].transform.position.y < missileTargetGO.transform.position.y)
-            {
-                //move up
-                moveVertical = 1;
-            }
-            else
-            {
-                //move down
-                moveVertical = -1;
-            }
-
-            towardsEnemyDirection = new Vector3(moveHorizontal, moveVertical, 0);
-
             //Rotate towards enemy
             direction = missileTargetGO.transform.position - _homingMissilesGO[missileID].transform.position;
-            targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
 
             direction.Normalize();
 
             rot_z = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             _homingMissilesGO[missileID].transform.rotation = Quaternion.Euler(0f, 0f, rot_z + -180);
 
-            //Move towards enemy  
-            ///_homingMissilesGO[missileID].transform.Translate(towardsEnemyDirection * _homingMissileSpeed * Time.deltaTime);
             _homingMissilesGO[missileID].transform.Translate(direction * _homingMissileSpeed * Time.deltaTime);
         }
         else
         {
-            Debug.Log("Player::MoveHomingMissile(): either missileTargetGO = null or _homingMissilesGO[missileID] = null");
+            //Debug.Log("Player::MoveHomingMissile(): either missileTargetGO = null or _homingMissilesGO[missileID] = null");
         }
     }
 
@@ -536,11 +541,18 @@ public class Player : MonoBehaviour
 
     public void EnableHomingMissileFiring()
     {
-        if(_currentHomingMissiles > 0)
-        {
-            _fireHomingMissileCooldownActive = false;
-        }
+        _fireHomingMissileCooldownActive = false;
         _moveHomingMissiles = false;
+
+        if (_missile1Fired == true)
+        {
+            _missile1Fired = false;
+        }
+        
+        if (_missile2Fired == true)
+        {
+            _missile2Fired = false;
+        }
     }
 
     public void LoseLife()
