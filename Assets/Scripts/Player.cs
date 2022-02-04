@@ -73,12 +73,15 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _homingMissileSpeed = 10f;
     private bool _moveHomingMissiles = false;
+    [SerializeField]
     private bool _missile1Fired = false;
+    [SerializeField]
     private bool _missile2Fired = false;
     private GameObject _enemyMissileTarget1;
     private GameObject _enemyMissileTarget2;
     [SerializeField]
     private GameObject[] _allEnemiesGO = new GameObject[100];
+    private int[] _allEnemiesTypes = new int[100];              // 1 - Enemy | 2 - Mine | 3 - Boss
     private bool _fireHomingMissileCooldownActive = false;
     private bool _delayAddHomingMissile1 = false;
     private bool _delayAddHomingMissile2 = false;
@@ -127,7 +130,8 @@ public class Player : MonoBehaviour
         {
             if (_fireHomingMissileCooldownActive == false && _currentHomingMissiles > 0)
             {
-                _allEnemiesGO = GameObject.FindGameObjectsWithTag("Enemy");
+                //_allEnemiesGO = GameObject.FindGameObjectsWithTag("Enemy");
+                SetAllCurrentEnemies();
                 FireHomingMissile();
             }
         }
@@ -284,6 +288,10 @@ public class Player : MonoBehaviour
             _shieldStrengthTextGO.GetComponent<TMP_Text>().text = _shieldPower.ToString();
             _playerShieldGO = Instantiate(_playerShieldPrefabGO, this.transform);
             _shieldStrengthGO.SetActive(true);
+        } else if (_shieldActive == true && _shieldPower < 3)
+        {
+            _shieldPower = 3;
+            _shieldStrengthTextGO.GetComponent<TMP_Text>().text = _shieldPower.ToString();
         }
     }
 
@@ -433,44 +441,127 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void SetAllCurrentEnemies()
+    {
+        GameObject[] enemiesGO = GameObject.FindGameObjectsWithTag("Enemy");
+        GameObject[] mines1GO = GameObject.FindGameObjectsWithTag("Mine");
+        GameObject[] mines2GO = GameObject.FindGameObjectsWithTag("FreezeMine");
+        GameObject boss = GameObject.FindGameObjectWithTag("Boss");
+
+        int allEnemiesLength = allEnemiesLength = enemiesGO.Length + mines1GO.Length + mines2GO.Length;
+
+        if (boss != null)
+        {
+            allEnemiesLength += 1;
+        }
+        
+        int currLength;
+
+        GameObject[] allEnemiesGO = new GameObject[allEnemiesLength];
+        int[] allEnemyTypes = new int[allEnemiesLength];
+
+        //Add all enemyGO game objects to allEnemiesGO
+        currLength = enemiesGO.Length;
+
+        for (int i = 0; i < currLength; i++)
+        {
+            allEnemiesGO[i] = enemiesGO[i];
+            allEnemyTypes[i] = 1;
+        }
+
+        //Add all mines1GO
+        currLength = mines1GO.Length;
+
+        for (int i = 0 + enemiesGO.Length; i < enemiesGO.Length + currLength; i++)
+        {
+
+            allEnemiesGO[i] = mines1GO[i - enemiesGO.Length];
+            allEnemyTypes[i] = 2;
+        }
+
+        //Add all mines2GO
+        currLength = mines2GO.Length;
+
+        for (int i = 0 + enemiesGO.Length + mines1GO.Length; i < enemiesGO.Length + mines1GO.Length + currLength; i++)
+        {
+            allEnemiesGO[i] = mines2GO[i - enemiesGO.Length - mines1GO.Length];
+            allEnemyTypes[i] = 2;
+        }
+
+        //Add boss if exists
+        if(boss != null)
+        {
+            allEnemiesGO[allEnemiesLength - 1] = boss.gameObject;
+            allEnemyTypes[allEnemiesLength - 1] = 3;
+        }
+
+        _allEnemiesGO = allEnemiesGO;
+        _allEnemiesTypes = allEnemyTypes;
+    }
+
     private GameObject UpdateHomingMissileTarget()
     {
         int highestEnemyStrength = -1;
         float targetEnemyDistance = -1;
         float currEnemyDistance = -1;
         GameObject targetEnemyGO = null;
+        bool enemyHasDied = true;
+        int currEnemyStrength = -1;
+        int enemyIndex = -1;
 
-        _allEnemiesGO = GameObject.FindGameObjectsWithTag("Enemy");
+        SetAllCurrentEnemies();
 
         foreach (GameObject enemyGO in _allEnemiesGO)
         {
-            //Check current enemyGO strength compared to highest strength so far
-            if (enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength() > highestEnemyStrength)
-            {
-                //make this the targetEnemy until a better one is found
-                highestEnemyStrength = enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength();
-                targetEnemyGO = enemyGO;
-                targetEnemyDistance = Vector3.Distance(transform.position, targetEnemyGO.transform.position);
-            }
-            else if (enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength() == highestEnemyStrength)
-            {
-                //current enemyGO is = strength to targetEnemyGO, which one is closer?
-                currEnemyDistance = Vector3.Distance(transform.position, enemyGO.transform.position);
+            enemyIndex += 1;
 
-                if (targetEnemyDistance != -1)
+            if (_allEnemiesTypes[enemyIndex] == 1)
+            {
+                //Enemy game object
+                enemyHasDied = enemyGO.transform.GetComponent<Enemy>().EnemyHasDied();
+                currEnemyStrength = enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength();
+            } else if (_allEnemiesTypes[enemyIndex] == 2)
+            {
+                //Mine game object
+                enemyHasDied = enemyGO.transform.GetComponent<Mine>().EnemyHasDied();
+                currEnemyStrength = enemyGO.transform.GetComponent<Mine>().GetEnemyStrength();
+            } else if (_allEnemiesTypes[enemyIndex] == 3)
+            {
+                //Boss game object
+                enemyHasDied = enemyGO.transform.GetComponent<Boss1>().EnemyHasDied();
+                currEnemyStrength = enemyGO.transform.GetComponent<Boss1>().GetEnemyStrength();
+            }
+
+            if (enemyHasDied == false)
+            {
+                //Check current enemyGO strength compared to highest strength so far
+                if (currEnemyStrength > highestEnemyStrength)
                 {
-                    if (currEnemyDistance < targetEnemyDistance)
-                    {
-                        //make this the targetEnemy until a better one is found
-                        highestEnemyStrength = enemyGO.transform.GetComponent<Enemy>().GetEnemyStrength();
-                        targetEnemyGO = enemyGO;
-                        targetEnemyDistance = Vector3.Distance(transform.position, targetEnemyGO.transform.position);
-                    }
+                    //make this the targetEnemy until a better one is found
+                    highestEnemyStrength = currEnemyStrength;
+                    targetEnemyGO = enemyGO;
+                    targetEnemyDistance = Vector3.Distance(transform.position, targetEnemyGO.transform.position);
                 }
-                else
+                else if (currEnemyStrength == highestEnemyStrength)
                 {
-                    targetEnemyGO = _allEnemiesGO[0];
-                    Debug.Log("Player::FireHomingMissile - targetEnemyDistance = -1");
+                    //current enemyGO is = strength to targetEnemyGO, which one is closer?
+                    currEnemyDistance = Vector3.Distance(transform.position, enemyGO.transform.position);
+
+                    if (targetEnemyDistance != -1)
+                    {
+                        if (currEnemyDistance < targetEnemyDistance)
+                        {
+                            //make this the targetEnemy until a better one is found
+                            highestEnemyStrength = currEnemyStrength;
+                            targetEnemyGO = enemyGO;
+                            targetEnemyDistance = Vector3.Distance(transform.position, targetEnemyGO.transform.position);
+                        }
+                    }
+                    else
+                    {
+                        targetEnemyGO = _allEnemiesGO[0];
+                        Debug.Log("Player::FireHomingMissile - targetEnemyDistance = -1");
+                    }
                 }
             }
         }
@@ -608,10 +699,23 @@ public class Player : MonoBehaviour
             //Tell all enemies player died
             GameObject[] allEnemiesGO = GameObject.FindGameObjectsWithTag("Enemy");
 
-            foreach(GameObject enemyGO in allEnemiesGO)
+            //Tell bosses player died
+            GameObject[] allBossesGO = GameObject.FindGameObjectsWithTag("Boss");
+
+            if (allEnemiesGO != null) {
+                foreach (GameObject enemyGO in allEnemiesGO)
+                {
+                    enemyGO.GetComponent<Enemy>().PlayerDied();
+                }
+            } else { Debug.Log("Player::LoseLife()- allEnemiesGO is null!"); }
+           
+            if (allBossesGO != null)
             {
-                enemyGO.GetComponent<Enemy>().PlayerDied();
-            }
+                foreach (GameObject bossGO in allBossesGO)
+                {
+                    bossGO.GetComponent<Boss1>().PlayerDied();
+                }
+            } else { Debug.Log("Player::LoseLife()- allBossesGO is nulL!"); }
 
             if (UIManagerScript != null)
             {
@@ -624,6 +728,11 @@ public class Player : MonoBehaviour
             if (_gameManager != null)
             {
                 _gameManager.GameOver();
+            }
+
+            if (_spawnManager != null)
+            {
+                _spawnManager.GameOver();
             }
 
             Destroy(this.gameObject);
@@ -681,6 +790,15 @@ public class Player : MonoBehaviour
         if (other.tag == "EnemyLaser")
         {
             LoseLife();
+        } else if (other.tag == "Mine")
+        {
+            Destroy(other.gameObject);
+            LoseLife();
+        } else if (other.tag == "FreezeMine")
+        {
+            Destroy(other.gameObject);
+            ShakeCamera(1f, 0.5f);
+            Stunned(3f);
         }
     }
 

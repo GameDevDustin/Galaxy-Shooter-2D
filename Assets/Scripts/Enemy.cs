@@ -72,13 +72,9 @@ public class Enemy : MonoBehaviour
         //Randomly assign enemy move type
         _enemyMoveType = Random.Range(0, 3);
 
-
+        //TESTING PURPOSES
         //Force enemyMoveType
         //_enemyMoveType = 1;
-
-        //***TODO*** ^ don't leave force enemyMoveType on after testing
-
-
 
         //Randomly assign enemy firing type
         _enemyFiringType = Random.Range(0, 2);
@@ -91,12 +87,9 @@ public class Enemy : MonoBehaviour
             _enemyFiringType = 2;
         }
 
+        //TESTING PURPOSES
         //Force enemyFiringType
-        //_enemyFiringType = 2;
-
-        //***TODO*** ^ don't leave force enemyMoveType on after testing
-
-        
+        //_enemyFiringType = 2;       
 
         switch (_enemyFiringType)
         {
@@ -143,7 +136,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(_playerDied == false)
+        if(_playerDied == false && _isDying == false)
         {
             CheckPlayerDistance();
         }
@@ -174,7 +167,7 @@ public class Enemy : MonoBehaviour
             }
         }
 
-        if(_disableEnemyFiring == false)
+        if(_disableEnemyFiring == false && _isDying == false)
         {
             switch (_enemyFiringType)
             {
@@ -221,7 +214,7 @@ public class Enemy : MonoBehaviour
             OnDeath();
         }
   
-        //if hits laser
+        //if hits laser or missile
         if (other.tag == "Laser" || other.tag == "Missile")
         {
             if (_shieldActive != true)
@@ -238,7 +231,7 @@ public class Enemy : MonoBehaviour
                 DeactivateShield();
             }
 
-            //destroy  laser game object
+            //destroy laser or missile game object
             Destroy(other.gameObject);
 
             if(other.tag == "Missile")
@@ -311,20 +304,32 @@ public class Enemy : MonoBehaviour
 
     private void FireBeam()
     {
-        _randomFiringTime = Random.Range(3f, 6f);
-        _nextBeamFiringTime = Time.time + _randomFiringTime;
+        if (_disableEnemyFiring == false && _isDying == false)
+        {
+            _randomFiringTime = Random.Range(3f, 6f);
+            _nextBeamFiringTime = Time.time + _randomFiringTime;
 
-        _tempEnemyLaserBeamGO = Instantiate(_enemyLaserBeamPrefabGO, transform.position + new Vector3(0, -10.5f, 0), Quaternion.identity);
-        _tempEnemyLaserBeamGO.transform.parent = transform;
+            _tempEnemyLaserBeamGO = Instantiate(_enemyLaserBeamPrefabGO, transform.position + new Vector3(0, -10.5f, 0), Quaternion.identity);
+            _tempEnemyLaserBeamGO.transform.parent = transform;
 
-        StartCoroutine(BeamLaserCooldown(5f));
+            StartCoroutine(BeamLaserCooldown(5f));
+        }
     }
 
     private IEnumerator BeamLaserCooldown(float delay)
     {
-
         yield return new WaitForSeconds(delay);
-        Destroy(_tempEnemyLaserBeamGO);
+        DestroyLaserBeam();
+    }
+
+    private void DestroyLaserBeam()
+    {
+        if (_tempEnemyLaserBeamGO != null)
+        {
+            _tempEnemyLaserBeamGO.GetComponent<BoxCollider2D>().enabled = false;
+            _tempEnemyLaserBeamGO.GetComponent<SpriteRenderer>().enabled = false;
+            Destroy(_tempEnemyLaserBeamGO);
+        }
     }
 
     private void AddShield()
@@ -341,16 +346,18 @@ public class Enemy : MonoBehaviour
 
     private void OnDeath()
     {
+        _disableEnemyFiring = true;
         _isDying = true;
+
+        if (_enemyFiringType == 2)
+        {
+            DestroyLaserBeam();
+        }
+
         _enemyAnimator.SetTrigger("OnEnemyDeath");
         this.GetComponent<BoxCollider2D>().enabled = false;
         _enemyAudioSource.clip = _enemyAudioClip;
         _enemyAudioSource.Play();
-
-        if (_enemyFiringType == 2)
-        {
-            Destroy(_tempEnemyLaserBeamGO);
-        }
         
         //destroy this enemy game object
         Destroy(this.gameObject, 2.5f);
@@ -408,6 +415,11 @@ public class Enemy : MonoBehaviour
     public int GetEnemyStrength()
     {
         return _enemyStrength;
+    }
+
+    public bool EnemyHasDied()
+    {
+        return _isDying;
     }
 
     private void DoNullChecks()

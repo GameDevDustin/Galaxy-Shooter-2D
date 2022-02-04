@@ -8,6 +8,9 @@ TagManager:
   - Laser
   - EnemyLaser
   - Missile
+  - Boss
+  - Mine
+  - FreezeMine
   layers:
   - Default
   - TransparentFX

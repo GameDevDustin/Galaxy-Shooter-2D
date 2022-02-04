@@ -5,7 +5,7 @@ using UnityEngine;
 public class Laser : MonoBehaviour
 {
     [SerializeField]
-    private float _speed;
+    private float _speed = 8;
     [SerializeField]
     private Vector3 _direction;
 
@@ -19,13 +19,19 @@ public class Laser : MonoBehaviour
     void Update()
     {
         //translate laser up
-        transform.Translate(_direction * _speed * Time.deltaTime);
+        transform.Translate(_direction * _speed * Time.deltaTime, Space.World);
+        //transform.Translate()
 
-        if (transform.position.y > 6.8 || transform.position.y < -5.5) { Destroy(this.gameObject); }
+        if (transform.position.x > 20 || transform.position.x < -20 || transform.position.y > 20 || transform.position.y < -20) { Destroy(this.gameObject); }
     }
 
     public void SetSpeed(float speed)
     {
         _speed = speed;
+    }
+
+    public void SetDirection(Vector3 direction)
+    {
+        _direction = direction;
     }
 }

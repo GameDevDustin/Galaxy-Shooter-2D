@@ -8,7 +8,11 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject _enemiesContainer;
     [SerializeField]
-    private GameObject _enemyGO;
+    private GameObject _bossesContainer;
+    [SerializeField]
+    private GameObject _enemyPrefabGO;
+    [SerializeField]
+    private GameObject _boss1PrefabGO;
     [SerializeField]
     private Vector3 _defaultSpawnPosition = new Vector3(0, 8, 0);
     [SerializeField]
@@ -42,14 +46,24 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private float _spawnWave5DelayTime = 9999f;
     [SerializeField]
+    private float _spawnBoss1WaveDelayTime = 9999f;
+    [SerializeField]
     private GameObject _newWaveTextGO;
     [SerializeField]
     private bool _start2ndWaveActive = false;
+    [SerializeField]
     private bool _start3rdWaveActive = false;
+    [SerializeField]
     private bool _start4thWaveActive = false;
+    [SerializeField]
     private bool _start5thWaveActive = false;
+    [SerializeField]
+    private bool _startBoss1WaveActive = false;
+    private bool _bossWaveActive = false;
 
     private bool _isDead = false;
+    private bool _victoryGameOver = false;
+    private bool _gameOver = false;
 
 
     // Start is called before the first frame update
@@ -61,38 +75,50 @@ public class SpawnManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Spawn enemy waves
-        if (_start2ndWaveActive == true && Time.time > _spawnWave2DelayTime)
+        if (_victoryGameOver == false && _gameOver == false && _isDead == false)
         {
-            _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 2 has begun!");
-            _newWaveTextGO.SetActive(true);
-            StartCoroutine(HideNewWaveText());
-            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 6f, 15f));
-            _start2ndWaveActive = false;
-        }  
-        else if (_start3rdWaveActive == true && Time.time > _spawnWave3DelayTime)
-        {
-            _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 3 has begun!");
-            _newWaveTextGO.SetActive(true);
-            StartCoroutine(HideNewWaveText());
-            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 9f, 20f));
-            _start3rdWaveActive = false;
-        }
-        else if (_start4thWaveActive == true && Time.time > _spawnWave4DelayTime)
-        {
-            _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 4 has begun!");
-            _newWaveTextGO.SetActive(true);
-            StartCoroutine(HideNewWaveText());
-            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 11f, 20f));
-            _start4thWaveActive = false;
-        }
-        else if (_start5thWaveActive == true && Time.time > _spawnWave5DelayTime)
-        {
-            _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 5 has begun!");
-            _newWaveTextGO.SetActive(true);
-            StartCoroutine(HideNewWaveText());
-            StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 20f, 30f));
-            _start5thWaveActive = false;
+            //Spawn enemy waves
+            if (_start2ndWaveActive == true && Time.time > _spawnWave2DelayTime)
+            {
+                _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 2 has begun!");
+                _newWaveTextGO.SetActive(true);
+                StartCoroutine(HideNewWaveText());
+                StartCoroutine(SpawnEnemyRoutine(_enemyPrefabGO, _defaultSpawnPosition, 6f, 15f));
+                _start2ndWaveActive = false;
+            }
+            else if (_start3rdWaveActive == true && Time.time > _spawnWave3DelayTime)
+            {
+                _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 3 has begun!");
+                _newWaveTextGO.SetActive(true);
+                StartCoroutine(HideNewWaveText());
+                StartCoroutine(SpawnEnemyRoutine(_enemyPrefabGO, _defaultSpawnPosition, 9f, 20f));
+                _start3rdWaveActive = false;
+            }
+            else if (_start4thWaveActive == true && Time.time > _spawnWave4DelayTime)
+            {
+                _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 4 has begun!");
+                _newWaveTextGO.SetActive(true);
+                StartCoroutine(HideNewWaveText());
+                StartCoroutine(SpawnEnemyRoutine(_enemyPrefabGO, _defaultSpawnPosition, 11f, 20f));
+                _start4thWaveActive = false;
+            }
+            else if (_start5thWaveActive == true && Time.time > _spawnWave5DelayTime)
+            {
+                _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Wave 5 has begun!");
+                _newWaveTextGO.SetActive(true);
+                StartCoroutine(HideNewWaveText());
+                StartCoroutine(SpawnEnemyRoutine(_enemyPrefabGO, _defaultSpawnPosition, 20f, 30f));
+                _start5thWaveActive = false;
+            }
+            else if (_startBoss1WaveActive == true && Time.time > _spawnBoss1WaveDelayTime)
+            {
+                _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Incoming Boss!");
+                _newWaveTextGO.SetActive(true);
+                StartCoroutine(HideNewWaveText());
+                SpawnBoss1();
+                _startBoss1WaveActive = false;
+                _bossWaveActive = true;
+            }
         }
     }
 
@@ -100,7 +126,7 @@ public class SpawnManager : MonoBehaviour
     {
         SetWaveTimes();
         _start2ndWaveActive = true;
-        StartCoroutine(SpawnEnemyRoutine(_enemyGO, _defaultSpawnPosition, 3f, 9f));
+        StartCoroutine(SpawnEnemyRoutine(_enemyPrefabGO, _defaultSpawnPosition, 3f, 9f));
         StartCoroutine(SpawnTripleShotRoutine(_powerupTripleShotGO, _defaultSpawnPosition, 12f, 25f));
         StartCoroutine(SpawnSpeedBoostRoutine(_powerupSpeedBoostGO, _defaultSpawnPosition, 19f, 35f));
         StartCoroutine(SpawnShieldRoutine(_powerupShieldGO, _defaultSpawnPosition, 35f, 65f));
@@ -109,7 +135,7 @@ public class SpawnManager : MonoBehaviour
         StartCoroutine(SpawnBurstLaserRoutine(_powerupLaserBurstGO, _defaultSpawnPosition, 55f, 75f));
         StartCoroutine(SpawnAddShieldPowerup(_powerupAddShieldPowerGO, _defaultSpawnPosition, 25f, 35f));
         StartCoroutine(SpawnRemoveShieldsPowerup(_powerupRemoveShieldsGO, _defaultSpawnPosition, 20f, 45f));
-        StartCoroutine(SpawnHomingMissilePowerupRoutine(_powerupHomingMissileGO, _defaultSpawnPosition, 5f, 10f));
+        StartCoroutine(SpawnHomingMissilePowerupRoutine(_powerupHomingMissileGO, _defaultSpawnPosition, 20f, 35f));
     }
 
     private void SetWaveTimes()
@@ -122,6 +148,12 @@ public class SpawnManager : MonoBehaviour
         StartCoroutine(StartNextWave(70f, 4));
         _spawnWave5DelayTime = Time.time + 85f;
         StartCoroutine(StartNextWave(85f, 5));
+        _spawnBoss1WaveDelayTime = Time.time + 120f;
+        StartCoroutine(StartNextWave(120f, 6));
+
+        //TESTING PURPOSES - trigger boss 
+        //_spawnBoss1WaveDelayTime = Time.time + 5f;
+        //StartCoroutine(StartNextWave(5f, 6));
     }
 
     IEnumerator StartNextWave(float waitSeconds, int wave)
@@ -141,15 +173,17 @@ public class SpawnManager : MonoBehaviour
             case 5:
                 _start5thWaveActive = true;
                 break;
+            case 6:
+                _startBoss1WaveActive = true;
+                _bossWaveActive = true;
+                break;
         }
     }
 
     IEnumerator HideNewWaveText()
     {
-
         yield return new WaitForSeconds(3f);
         _newWaveTextGO.SetActive(false);
-
     }
 
     IEnumerator SpawnHomingMissilePowerupRoutine(GameObject spawnedGameObject, Vector3 spawnPosition, float spawnInterval1, float spawnInterval2)
@@ -158,7 +192,7 @@ public class SpawnManager : MonoBehaviour
 
         yield return new WaitForSeconds(3.0f);
 
-        while (_isDead == false)
+        while (_isDead == false && _victoryGameOver == false && _gameOver == false)
         {
             GameObject newEnemyGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
             newEnemyGO.transform.parent = _enemiesContainer.transform;
@@ -172,11 +206,20 @@ public class SpawnManager : MonoBehaviour
 
         yield return new WaitForSeconds(3.0f);
 
-        while (_isDead == false)
+        while (_isDead == false && _bossWaveActive == false && _victoryGameOver == false && _gameOver == false)
         {
             GameObject newEnemyGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
             newEnemyGO.transform.parent = _enemiesContainer.transform;
             yield return new WaitForSeconds(randSpawnInterval);
+        }
+    }
+
+    private void SpawnBoss1()
+    {
+        if (_isDead == false)
+        {
+            GameObject newBoss1GO = Instantiate(_boss1PrefabGO, new Vector3(0, 15, 0), Quaternion.identity);
+            newBoss1GO.transform.parent = _bossesContainer.transform;
         }
     }
 
@@ -187,7 +230,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
 
         //Spawn powerup according to the intervals passed in
-        while (_isDead == false)
+        while (_isDead == false && _victoryGameOver == false && _gameOver == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
             GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
@@ -202,7 +245,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
 
         //Spawn powerup according to the intervals passed in
-        while (_isDead == false)
+        while (_isDead == false && _victoryGameOver == false && _gameOver == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
             GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
@@ -217,7 +260,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
 
         //Spawn powerup according to the intervals passed in
-        while (_isDead == false)
+        while (_isDead == false && _victoryGameOver == false && _gameOver == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
             GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
@@ -232,7 +275,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
 
         //Spawn powerup according to the intervals passed in
-        while (_isDead == false)
+        while (_isDead == false && _victoryGameOver == false && _gameOver == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
             GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
@@ -247,7 +290,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
 
         //Spawn powerup according to the intervals passed in
-        while (_isDead == false)
+        while (_isDead == false && _victoryGameOver == false && _gameOver == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
             GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
@@ -262,7 +305,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
 
         //Spawn powerup according to the intervals passed in
-        while (_isDead == false)
+        while (_isDead == false && _victoryGameOver == false && _gameOver == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
             GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
@@ -277,7 +320,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
 
         //Spawn powerup according to the intervals passed in
-        while (_isDead == false)
+        while (_isDead == false && _victoryGameOver == false && _gameOver == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
             GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
@@ -292,7 +335,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
 
         //Spawn powerup according to the intervals passed in
-        while (_isDead == false)
+        while (_isDead == false && _victoryGameOver == false && _gameOver == false)
         {
             yield return new WaitForSeconds(randSpawnInterval);
             GameObject newPowerupGO = Instantiate(spawnedGameObject, spawnPosition, Quaternion.identity);
@@ -307,7 +350,7 @@ public class SpawnManager : MonoBehaviour
             Debug.Log("SpawnManager::DoNullChecks() - _enemiesContainer is null!");
         }
 
-        if (_enemyGO == null)
+        if (_enemyPrefabGO == null)
         {
             Debug.Log("SpawnManager::DoNullChecks() - _enemyGO is null!");
         }
@@ -344,18 +387,8 @@ public class SpawnManager : MonoBehaviour
 
         if (_powerupLaserBurstGO == null)
         {
-            Debug.Log("SpawnManager::DoNullChecks() - _powerupLaserBurstGO is null!");        
+            Debug.Log("SpawnManager::DoNullChecks() - _powerupLaserBurstGO is null!");
         }
-        
-        //if (_newWaveText == null)
-        //{
-        //    Debug.Log("SpawnManager::DoNullChecks() - _newWaveText is null!");
-        //}
-
-        //if(_newWaveText != null)
-        //{
-        //    _newWaveTextGO = _newWaveText.gameObject;
-        //}
 
         if (_newWaveTextGO == null)
         {
@@ -368,4 +401,15 @@ public class SpawnManager : MonoBehaviour
         _isDead = true;
     }
 
+    public void VictoryGameOver()
+    {
+        _victoryGameOver = true;
+        _newWaveTextGO.transform.GetComponent<TMP_Text>().SetText("Victory!");
+        _newWaveTextGO.SetActive(true);
+    }
+
+    public void GameOver()
+    {
+        _gameOver = true;
+    }
 }
